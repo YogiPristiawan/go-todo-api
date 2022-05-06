@@ -8,7 +8,13 @@ import (
 )
 
 type UsersHandler struct {
-	useCase use_case.UserUseCase
+	useCase *use_case.UserUseCase
+}
+
+func New(usecase *use_case.UserUseCase) *UsersHandler {
+	return &UsersHandler{
+		useCase: usecase,
+	}
 }
 
 func (u *UsersHandler) GetAllUsers(c echo.Context) error {
