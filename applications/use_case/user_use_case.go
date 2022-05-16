@@ -1,11 +1,21 @@
 package use_case
 
-import "github.com/YogiPristiawan/go-todo-api/infrastructures/repository"
+import (
+	"github.com/YogiPristiawan/go-todo-api/domains/users"
+	"github.com/YogiPristiawan/go-todo-api/domains/users/entities"
+)
 
-type UserUseCase struct {
-	userRepository *repository.UserRepository
+type userUseCase struct {
+	userRepository users.UserRepository
 }
 
-func (u *UserUseCase) GetAllUsers() []map[string]interface{} {
-	return u.userRepository.GetAllUsers()
+func NewUserUseCase(r users.UserRepository) users.UserUseCase {
+	return &userUseCase{
+		userRepository: r,
+	}
+}
+
+func (u *userUseCase) GetAllUsers() []*entities.GetUsersResponse {
+	users := u.userRepository.GetAllUsers()
+	return entities.MapGetUsersResponse(users)
 }

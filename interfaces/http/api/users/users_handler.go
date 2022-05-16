@@ -1,24 +1,28 @@
 package users
 
 import (
-	"net/http"
-
-	"github.com/YogiPristiawan/go-todo-api/applications/use_case"
+	"github.com/YogiPristiawan/go-todo-api/applications/helpers"
+	"github.com/YogiPristiawan/go-todo-api/domains/users"
 	"github.com/labstack/echo/v4"
 )
 
-type UsersHandler struct {
-	useCase *use_case.UserUseCase
+type usersHandler struct {
+	useCase users.UserUseCase
 }
 
-func New(usecase *use_case.UserUseCase) *UsersHandler {
-	return &UsersHandler{
+func NewUsersHandler(usecase users.UserUseCase) *usersHandler {
+	return &usersHandler{
 		useCase: usecase,
 	}
 }
 
-func (u *UsersHandler) GetAllUsers(c echo.Context) error {
+func (u *usersHandler) GetAllUsers(c echo.Context) error {
+
 	users := u.useCase.GetAllUsers()
 
-	return c.JSON(http.StatusOK, users)
+	return helpers.ResponseJsonHttpOk(c, &helpers.ResponseContract{
+		Message: "Success get all users",
+		Status:  "succes",
+		Data:    users,
+	})
 }
