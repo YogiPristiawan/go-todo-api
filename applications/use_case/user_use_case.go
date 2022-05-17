@@ -15,7 +15,20 @@ func NewUserUseCase(r users.UserRepository) users.UserUseCase {
 	}
 }
 
-func (u *userUseCase) GetAllUsers() []*entities.GetUsersResponse {
-	users := u.userRepository.GetAllUsers()
-	return entities.MapGetUsersResponse(users)
+func (u *userUseCase) GetAllUsers() ([]*entities.GetUsersResponse, error) {
+	users, err := u.userRepository.GetAllUsers()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return entities.MapGetUsersResponse(users), err
+}
+
+func (u *userUseCase) DetailUserById(userId int) (*entities.GetUserByIdResponse, error) {
+	user, err := u.userRepository.GetUserById(userId)
+	if err != nil {
+		return nil, err
+	}
+	return entities.MapGetUserByIdResponse(user), err
 }

@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"errors"
+
+	"github.com/YogiPristiawan/go-todo-api/applications/exceptions"
 	"github.com/YogiPristiawan/go-todo-api/domains/users"
 	"github.com/YogiPristiawan/go-todo-api/domains/users/entities"
 	"gorm.io/gorm"
@@ -16,8 +19,30 @@ func NewUserRepository(db *gorm.DB) users.UserRepository {
 	}
 }
 
-func (u *userRepository) GetAllUsers() []*entities.UserModel {
+func (u *userRepository) GetAllUsers() ([]*entities.UserModel, error) {
 	var user []*entities.UserModel
-	u.db.Find(&user)
-	return user
+	err := u.db.Find(&user).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, exceptions.NewNotFoundError("data not found")
+		}
+		panic(err)
+	}
+
+	return user, nil
+}
+
+func (u *userRepository) GetUserById(id int) (*entities.UserModel, error) {
+	var user *entities.UserModel
+	err := u.db.First(&user, id).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, exceptions.NewNotFoundError("data not found")
+		}
+		panic(err)
+	}
+
+	return user, nil
 }

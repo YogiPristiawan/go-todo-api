@@ -17,5 +17,5 @@ func CreateRoutes(e *echo.Echo, db *gorm.DB) {
 
 	userRepository := repository.NewUserRepository(db)
 	userUseCase := use_case.NewUserUseCase(userRepository)
-	users.Users(e, userUseCase)
+	users.InitRoutes(e, userUseCase)
 }

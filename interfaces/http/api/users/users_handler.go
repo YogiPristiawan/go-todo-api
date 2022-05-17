@@ -1,28 +1,53 @@
 package users
 
 import (
+	"strconv"
+
+	"github.com/YogiPristiawan/go-todo-api/applications/exceptions"
 	"github.com/YogiPristiawan/go-todo-api/applications/helpers"
 	"github.com/YogiPristiawan/go-todo-api/domains/users"
 	"github.com/labstack/echo/v4"
 )
 
-type usersHandler struct {
+type UserHandler struct {
 	useCase users.UserUseCase
 }
 
-func NewUsersHandler(usecase users.UserUseCase) *usersHandler {
-	return &usersHandler{
+func NewUserHandler(usecase users.UserUseCase) *UserHandler {
+	return &UserHandler{
 		useCase: usecase,
 	}
 }
 
-func (u *usersHandler) GetAllUsers(c echo.Context) error {
+func (u *UserHandler) GetAllUsers(c echo.Context) error {
+	users, err := u.useCase.GetAllUsers()
 
-	users := u.useCase.GetAllUsers()
+	if err != nil {
+		return helpers.HandleError(c, err)
+	}
 
-	return helpers.ResponseJsonHttpOk(c, &helpers.ResponseContract{
-		Message: "Success get all users",
-		Status:  "succes",
-		Data:    users,
-	})
+	return helpers.ResponseJsonHttpOk(
+		c,
+		"success get all users",
+		users,
+	)
+}
+
+func (u *UserHandler) DetailUser(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return helpers.HandleError(c, exceptions.NewInvariantError("parameter harus berupa integer"))
+	}
+
+	user, err := u.useCase.DetailUserById(id)
+
+	if err != nil {
+		return helpers.HandleError(c, err)
+	}
+
+	return helpers.ResponseJsonHttpOk(
+		c,
+		"detail user",
+		user,
+	)
 }

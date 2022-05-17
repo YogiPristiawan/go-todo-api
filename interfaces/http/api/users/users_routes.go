@@ -5,12 +5,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Users(
-	e *echo.Echo,
-	useCase users.UserUseCase,
-) {
-	usersHandler := NewUsersHandler(useCase)
-	users := e.Group("/users")
+var userHandler *UserHandler
 
-	users.GET("", usersHandler.GetAllUsers)
+func InitRoutes(e *echo.Echo, useCase users.UserUseCase) {
+	g := e.Group("/users")
+	userHandler = NewUserHandler(useCase)
+
+	g.GET("", userHandler.GetAllUsers)
+	g.GET("/:id", userHandler.DetailUser)
 }
