@@ -39,7 +39,20 @@ func (u *userRepository) GetUserById(id int) (*entities.UserModel, error) {
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, exceptions.NewNotFoundError("data not found")
+			return nil, exceptions.NewNotFoundError("user not found")
+		}
+		panic(err)
+	}
+
+	return user, nil
+}
+
+func (u *userRepository) FindUserByUsername(username string) (*entities.UserModel, error) {
+	var user *entities.UserModel
+	err := u.db.Where("username = ?", username).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, exceptions.NewNotFoundError("user not found")
 		}
 		panic(err)
 	}

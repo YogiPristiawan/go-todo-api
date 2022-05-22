@@ -5,6 +5,8 @@ import (
 
 	"github.com/YogiPristiawan/go-todo-api/infrastructures/databases/mysql"
 	"github.com/YogiPristiawan/go-todo-api/infrastructures/http"
+	"github.com/YogiPristiawan/go-todo-api/infrastructures/validator"
+	"github.com/YogiPristiawan/go-todo-api/infrastructures/validator/translate"
 	"github.com/YogiPristiawan/go-todo-api/interfaces/http/api"
 	"github.com/joho/godotenv"
 )
@@ -14,10 +16,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// conect to database
 	db := mysql.CreateConnection()
 
+	// create server instance
 	server := http.CreateServer()
-	api.CreateRoutes(server, db)
+
+	// create validator and validator translation instance
+	validator := validator.CreateRequestValidator()
+	trans := translate.CreateRequestValidatorTranslate(validator)
+
+	// register routes
+	api.CreateRoutes(server, db, validator, trans)
 	server.Logger.Fatal(server.Start(":8080"))
 }

@@ -1,4 +1,4 @@
-package users
+package user
 
 import (
 	"strconv"
@@ -13,9 +13,9 @@ type UserHandler struct {
 	useCase users.UserUseCase
 }
 
-func NewUserHandler(usecase users.UserUseCase) *UserHandler {
+func NewUserHandler(useCase users.UserUseCase) *UserHandler {
 	return &UserHandler{
-		useCase: usecase,
+		useCase: useCase,
 	}
 }
 
