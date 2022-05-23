@@ -59,3 +59,37 @@ func (a *AuthHandler) Login(c echo.Context) error {
 
 	return helpers.ResponseJsonHttpOk(c, "login success", result)
 }
+
+func (a *AuthHandler) Register(c echo.Context) error {
+	// collect payload
+	r := new(entities.AuthRegisterRequest)
+	if err := (&echo.DefaultBinder{}).BindBody(c, r); err != nil {
+		return helpers.HandleError(c, err)
+	}
+
+	// validate payload
+	if err := a.validator.Struct(r); err != nil {
+		if he, ok := err.(validator.ValidationErrors); ok {
+			errors := he.Translate(a.validatorTranslation)
+
+			for _, val := range errors {
+				return helpers.HandleError(c, exceptions.NewInvariantError(val))
+			}
+		}
+	}
+
+	payload := &entities.AuthRegisterRequest{
+		Username:  r.Username,
+		Password:  r.Password,
+		Gender:    r.Gender,
+		BirthDate: r.BirthDate,
+	}
+
+	result, err := a.useCase.Register(payload)
+	if err != nil {
+		return helpers.HandleError(c, err)
+	}
+
+	return helpers.ResponseJsonCreated(c, "register success", result)
+
+}

@@ -1,16 +1,12 @@
 package entities
 
-import (
-	"time"
-)
-
 type GetUsersResponse struct {
-	ID        uint      `json:"id"`
-	Username  string    `json:"username"`
-	Gender    string    `json:"gender"`
-	BirthDate time.Time `json:"birth_date"`
-	CreatedAt uint      `json:"created_at"`
-	UpdatedAt uint      `json:"updated_at"`
+	ID        uint    `json:"id"`
+	Username  string  `json:"username"`
+	Gender    *string `json:"gender"`
+	BirthDate *string `json:"birth_date"`
+	CreatedAt int64   `json:"created_at"`
+	UpdatedAt int64   `json:"updated_at"`
 }
 
 func MapGetUsersResponse(users []*UserModel) []*GetUsersResponse {

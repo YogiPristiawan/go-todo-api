@@ -20,6 +20,14 @@ func ResponseJsonHttpOk(c echo.Context, message string, data interface{}) error 
 	})
 }
 
+func ResponseJsonCreated(c echo.Context, message string, data interface{}) error {
+	return c.JSON(http.StatusCreated, &responseContract{
+		Message: message,
+		Status:  "success",
+		Data:    data,
+	})
+}
+
 func ResponseJsonBadRequest(c echo.Context, message string) error {
 	return c.JSON(http.StatusBadRequest, &responseContract{
 		Message: message,

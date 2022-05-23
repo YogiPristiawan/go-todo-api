@@ -19,4 +19,5 @@ func InitRoutes(
 	handler = NewAuthHandler(useCase, validator, validatorTranslation)
 
 	g.POST("/login", handler.Login)
+	g.POST("/register", handler.Register)
 }

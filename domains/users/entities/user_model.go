@@ -1,15 +1,13 @@
 package entities
 
-import "time"
-
 type UserModel struct {
 	ID        uint
 	Username  string
 	Password  string
-	Gender    string
-	BirthDate time.Time
-	CreatedAt uint
-	UpdatedAt uint
+	Gender    *string
+	BirthDate *string
+	CreatedAt int64 `gorm:"autoCreateTime"`
+	UpdatedAt int64 `gorm:"autoUpdateTime"`
 }
 
 func (UserModel) TableName() string {

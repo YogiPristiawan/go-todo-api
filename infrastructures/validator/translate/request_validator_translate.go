@@ -17,6 +17,7 @@ func CreateRequestValidatorTranslate(validator *validator.Validate) ut.Translato
 	idTranslations.RegisterDefaultTranslations(validator, trans)
 
 	addTranslation(validator, trans, "username", "{0} mangandung karakter yang tidak diizinkan")
+	addTranslation(validator, trans, "datetime", "{0} harus berformat {1}")
 	return trans
 }
 
