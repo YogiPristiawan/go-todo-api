@@ -5,6 +5,8 @@ import (
 
 	"github.com/YogiPristiawan/go-todo-api/infrastructures/databases/mysql"
 	"github.com/YogiPristiawan/go-todo-api/infrastructures/http"
+	"github.com/YogiPristiawan/go-todo-api/infrastructures/security/middleware"
+	"github.com/YogiPristiawan/go-todo-api/infrastructures/security/tokenize"
 	"github.com/YogiPristiawan/go-todo-api/infrastructures/validator"
 	"github.com/YogiPristiawan/go-todo-api/infrastructures/validator/translate"
 	"github.com/YogiPristiawan/go-todo-api/interfaces/http/api"
@@ -26,7 +28,13 @@ func main() {
 	validator := validator.CreateRequestValidator()
 	trans := translate.CreateRequestValidatorTranslate(validator)
 
+	// create tokenize
+	tokenize := tokenize.NewJwtToken()
+
+	// create middleware config
+	jwtMiddleware := middleware.CreateMiddlewareConfig()
+
 	// register routes
-	api.CreateRoutes(server, db, validator, trans)
+	api.CreateRoutes(server, db, validator, trans, jwtMiddleware, tokenize)
 	server.Logger.Fatal(server.Start(":8080"))
 }

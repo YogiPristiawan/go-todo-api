@@ -8,15 +8,21 @@ import (
 	"github.com/YogiPristiawan/go-todo-api/domains/auth/entities"
 	"github.com/YogiPristiawan/go-todo-api/domains/users"
 	userEntities "github.com/YogiPristiawan/go-todo-api/domains/users/entities"
+	"github.com/YogiPristiawan/go-todo-api/infrastructures/security/tokenize"
 )
 
 type authUseCase struct {
 	userRepository users.UserRepository
+	tokenize       *tokenize.JwtToken
 }
 
-func NewAuthUseCase(userRepository users.UserRepository) auth.AuthUseCase {
+func NewAuthUseCase(
+	userRepository users.UserRepository,
+	tokenize *tokenize.JwtToken,
+) auth.AuthUseCase {
 	return &authUseCase{
 		userRepository: userRepository,
+		tokenize:       tokenize,
 	}
 }
 
@@ -31,7 +37,7 @@ func (a *authUseCase) Login(payload *entities.AuthLoginRequest) (*entities.AuthL
 	}
 
 	// generate access token
-	accessToken := helpers.GenerateAccessToken(user.ID)
+	accessToken := a.tokenize.GenerateAccessToken(user.ID)
 
 	return &entities.AuthLoginResponse{
 		AccessToken: accessToken,
@@ -57,7 +63,7 @@ func (a *authUseCase) Register(payload *entities.AuthRegisterRequest) (*entities
 	}
 
 	// genereate access token
-	accessToken := helpers.GenerateAccessToken(user.ID)
+	accessToken := a.tokenize.GenerateAccessToken(user.ID)
 
 	return &entities.AuthRegisterResponse{
 		AccessToken: accessToken,

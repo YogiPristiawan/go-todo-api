@@ -34,12 +34,12 @@ func (u *UserHandler) GetAllUsers(c echo.Context) error {
 }
 
 func (u *UserHandler) DetailUser(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		return helpers.HandleError(c, exceptions.NewInvariantError("parameter harus berupa integer"))
 	}
 
-	user, err := u.useCase.DetailUserById(id)
+	user, err := u.useCase.DetailUserById(uint(id))
 
 	if err != nil {
 		return helpers.HandleError(c, err)

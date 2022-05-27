@@ -41,7 +41,7 @@ func (u *userRepository) GetAllUsers() ([]*entities.UserModel, error) {
 	return user, nil
 }
 
-func (u *userRepository) GetUserById(id int) (*entities.UserModel, error) {
+func (u *userRepository) GetUserById(id uint) (*entities.UserModel, error) {
 	var user *entities.UserModel
 	err := u.db.First(&user, id).Error
 
