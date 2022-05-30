@@ -9,17 +9,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type UserHandler struct {
+type userHandler struct {
 	useCase users.UserUseCase
 }
 
-func NewUserHandler(useCase users.UserUseCase) *UserHandler {
-	return &UserHandler{
-		useCase: useCase,
-	}
-}
-
-func (u *UserHandler) GetAllUsers(c echo.Context) error {
+func (u *userHandler) getAllUsers(c echo.Context) error {
 	users, err := u.useCase.GetAllUsers()
 
 	if err != nil {
@@ -33,7 +27,7 @@ func (u *UserHandler) GetAllUsers(c echo.Context) error {
 	)
 }
 
-func (u *UserHandler) DetailUser(c echo.Context) error {
+func (u *userHandler) detailUser(c echo.Context) error {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		return helpers.HandleError(c, exceptions.NewInvariantError("parameter harus berupa integer"))

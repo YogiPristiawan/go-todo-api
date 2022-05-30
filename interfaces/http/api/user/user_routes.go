@@ -1,16 +1,25 @@
 package user
 
 import (
+	"github.com/YogiPristiawan/go-todo-api/domains"
 	"github.com/YogiPristiawan/go-todo-api/domains/users"
-	"github.com/labstack/echo/v4"
+	"github.com/golobby/container/v3"
 )
 
-var userHandler *UserHandler
+var server domains.Server
+var userUseCase users.UserUseCase
 
-func InitRoutes(e *echo.Echo, useCase users.UserUseCase) {
+func InitRoutes() {
+	container.Resolve(&server)
+	container.Resolve(&userUseCase)
+
+	handler := &userHandler{
+		useCase: userUseCase,
+	}
+
+	e := server.GetHttp()
+
 	g := e.Group("/users")
-	userHandler = NewUserHandler(useCase)
-
-	g.GET("", userHandler.GetAllUsers)
-	g.GET("/:id", userHandler.DetailUser)
+	g.GET("", handler.getAllUsers)
+	g.GET("/:id", handler.detailUser)
 }

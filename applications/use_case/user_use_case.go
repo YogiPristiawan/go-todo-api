@@ -4,22 +4,19 @@ import (
 	"github.com/YogiPristiawan/go-todo-api/domains/users"
 	"github.com/YogiPristiawan/go-todo-api/domains/users/entities"
 	"github.com/YogiPristiawan/go-todo-api/infrastructures/security/tokenize"
+	ut "github.com/go-playground/universal-translator"
+	"github.com/go-playground/validator/v10"
 )
 
-type userUseCase struct {
-	userRepository users.UserRepository
-	tokenize       *tokenize.JwtToken
+type UserUseCase struct {
+	UserRepository users.UserRepository
+	Tokenize       *tokenize.JwtToken
+	Validator      *validator.Validate
+	Translator     ut.Translator
 }
 
-func NewUserUseCase(r users.UserRepository, tokenize *tokenize.JwtToken) users.UserUseCase {
-	return &userUseCase{
-		userRepository: r,
-		tokenize:       tokenize,
-	}
-}
-
-func (u *userUseCase) GetAllUsers() ([]*entities.GetUsersResponse, error) {
-	users, err := u.userRepository.GetAllUsers()
+func (u *UserUseCase) GetAllUsers() ([]*entities.GetUsersResponse, error) {
+	users, err := u.UserRepository.GetAllUsers()
 
 	if err != nil {
 		return nil, err
@@ -28,8 +25,8 @@ func (u *userUseCase) GetAllUsers() ([]*entities.GetUsersResponse, error) {
 	return entities.MapGetUsersResponse(users), err
 }
 
-func (u *userUseCase) DetailUserById(userId uint) (*entities.GetUserByIdResponse, error) {
-	user, err := u.userRepository.GetUserById(userId)
+func (u *UserUseCase) DetailUserById(userId uint) (*entities.GetUserByIdResponse, error) {
+	user, err := u.UserRepository.GetUserById(userId)
 	if err != nil {
 		return nil, err
 	}
