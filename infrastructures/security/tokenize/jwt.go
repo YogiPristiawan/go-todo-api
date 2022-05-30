@@ -1,6 +1,7 @@
 package tokenize
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -51,4 +52,8 @@ func (t *JwtToken) DecodeAccessToken(tokenString string) (*customClaims, error) 
 	} else {
 		return nil, err
 	}
+}
+
+func (t *JwtToken) TestFunc() {
+	fmt.Printf("Infrastructures.Tokenzie: Hello World")
 }

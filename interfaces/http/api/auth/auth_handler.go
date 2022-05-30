@@ -11,25 +11,13 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type AuthHandler struct {
+type authHandler struct {
 	useCase              auth.AuthUseCase
 	validator            *validator.Validate
 	validatorTranslation ut.Translator
 }
 
-func NewAuthHandler(
-	useCase auth.AuthUseCase,
-	validator *validator.Validate,
-	validationTranslation ut.Translator,
-) *AuthHandler {
-	return &AuthHandler{
-		useCase:              useCase,
-		validator:            validator,
-		validatorTranslation: validationTranslation,
-	}
-}
-
-func (a *AuthHandler) Login(c echo.Context) error {
+func (a *authHandler) login(c echo.Context) error {
 	// collect payload
 	l := new(entities.AuthLoginRequest)
 	if err := (&echo.DefaultBinder{}).BindBody(c, l); err != nil {
@@ -60,7 +48,7 @@ func (a *AuthHandler) Login(c echo.Context) error {
 	return helpers.ResponseJsonHttpOk(c, "login success", result)
 }
 
-func (a *AuthHandler) Register(c echo.Context) error {
+func (a *authHandler) register(c echo.Context) error {
 	// collect payload
 	r := new(entities.AuthRegisterRequest)
 	if err := (&echo.DefaultBinder{}).BindBody(c, r); err != nil {

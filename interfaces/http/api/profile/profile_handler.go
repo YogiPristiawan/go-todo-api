@@ -5,23 +5,16 @@ import (
 
 	"github.com/YogiPristiawan/go-todo-api/applications/helpers"
 	"github.com/YogiPristiawan/go-todo-api/domains/profile"
-	"github.com/YogiPristiawan/go-todo-api/infrastructures/security/tokenize"
+	tokenizeInfra "github.com/YogiPristiawan/go-todo-api/infrastructures/security/tokenize"
 	"github.com/labstack/echo/v4"
 )
 
-type ProfileHandler struct {
+type profileHandler struct {
 	useCase  profile.ProfileUseCase
-	tokenize *tokenize.JwtToken
+	tokenize *tokenizeInfra.JwtToken
 }
 
-func NewProfileHandler(useCase profile.ProfileUseCase, tokenize *tokenize.JwtToken) *ProfileHandler {
-	return &ProfileHandler{
-		useCase:  useCase,
-		tokenize: tokenize,
-	}
-}
-
-func (p *ProfileHandler) GetProfile(c echo.Context) error {
+func (p *profileHandler) getProfile(c echo.Context) error {
 	authorization := c.Request().Header["Authorization"]
 	token := strings.Split(authorization[0], " ")[1]
 

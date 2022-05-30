@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func CreateMiddlewareConfig() echo.MiddlewareFunc {
+func CreateAuthMiddleware() echo.MiddlewareFunc {
 	signingKey := []byte(os.Getenv("ACCESS_TOKEN_SECRET"))
 
 	config := middleware.JWTConfig{
