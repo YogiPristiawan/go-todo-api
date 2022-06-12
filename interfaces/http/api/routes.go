@@ -6,6 +6,7 @@ import (
 	"github.com/YogiPristiawan/go-todo-api/domains"
 	"github.com/YogiPristiawan/go-todo-api/interfaces/http/api/auth"
 	"github.com/YogiPristiawan/go-todo-api/interfaces/http/api/profile"
+	"github.com/YogiPristiawan/go-todo-api/interfaces/http/api/todo"
 	"github.com/YogiPristiawan/go-todo-api/interfaces/http/api/user"
 	"github.com/golobby/container/v3"
 	"github.com/labstack/echo/v4"
@@ -31,4 +32,5 @@ func CreateRoutes() {
 	user.InitRoutes()
 	auth.InitRoutes()
 	profile.InitRoutes()
+	todo.InitRoutes()
 }
