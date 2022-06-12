@@ -7,6 +7,7 @@ import (
 	"github.com/YogiPristiawan/go-todo-api/domains"
 	"github.com/YogiPristiawan/go-todo-api/domains/auth"
 	"github.com/YogiPristiawan/go-todo-api/domains/profile"
+	"github.com/YogiPristiawan/go-todo-api/domains/todo"
 	"github.com/YogiPristiawan/go-todo-api/domains/users"
 	"github.com/YogiPristiawan/go-todo-api/infrastructures"
 	"github.com/YogiPristiawan/go-todo-api/infrastructures/databases/mysql"
@@ -95,6 +96,11 @@ func registerRepository() {
 			DB: db.GetMysql(),
 		}
 	})
+	container.Singleton(func(db domains.Database) todo.TodoRepository {
+		return &repository.TodoRepository{
+			DB: db.GetMysql(),
+		}
+	})
 }
 
 func registerUseCase() {
@@ -107,13 +113,19 @@ func registerUseCase() {
 	})
 	container.Singleton(func(r users.UserRepository, t domains.Security) auth.AuthUseCase {
 		return &use_case.AuthUseCase{
-			UserRepository: r,
-			Tokenize:       t.GetJwt(),
+			UserRepository:  r,
+			Tokenize:        t.GetJwt(),
+			PasswordManager: t.GetHashPassword(),
 		}
 	})
 	container.Singleton(func(r users.UserRepository) profile.ProfileUseCase {
 		return &use_case.ProfileUseCase{
 			UserRepository: r,
+		}
+	})
+	container.Singleton(func(r todo.TodoRepository, t domains.Security) todo.TodoUseCase {
+		return &use_case.TodoUseCase{
+			TodoRepository: r,
 		}
 	})
 
