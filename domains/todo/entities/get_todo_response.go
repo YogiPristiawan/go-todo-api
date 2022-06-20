@@ -10,6 +10,11 @@ type GetTodoResponse struct {
 
 func MapGetTodoResponse(todos []*TodoModel) []*GetTodoResponse {
 	var todoResponse []*GetTodoResponse
+
+	if len(todos) == 0 {
+		return make([]*GetTodoResponse, 0)
+	}
+
 	for _, val := range todos {
 		todoResponse = append(todoResponse, &GetTodoResponse{
 			ID:         val.ID,
