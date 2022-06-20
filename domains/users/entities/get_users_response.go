@@ -1,5 +1,7 @@
 package entities
 
+import "fmt"
+
 type GetUsersResponse struct {
 	ID        uint    `json:"id"`
 	Username  string  `json:"username"`
@@ -12,7 +14,12 @@ type GetUsersResponse struct {
 func MapGetUsersResponse(users []*UserModel) []*GetUsersResponse {
 	var usersResponse []*GetUsersResponse
 
+	if len(users) == 0 {
+		return make([]*GetUsersResponse, 0)
+	}
+
 	for _, value := range users {
+		fmt.Println("masuk ke looping")
 		usersResponse = append(usersResponse, &GetUsersResponse{
 			ID:        value.ID,
 			Username:  value.Username,

@@ -32,10 +32,7 @@ func (u *UserRepository) GetAllUsers() ([]*entities.UserModel, error) {
 	err := u.DB.Find(&user).Error
 
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, exceptions.NewNotFoundError("data not found")
-		}
-		panic(err)
+		return nil, err
 	}
 
 	return user, nil
