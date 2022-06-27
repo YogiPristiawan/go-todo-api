@@ -1,0 +1,13 @@
+version: "3"
+services:
+  app:
+    image: yogipristiawan/go-todo-api:${APP_VERSION:-v1}
+    container_name: go-todo-api
+    env_file: 
+      - .env
+    ports:
+      - "8080:8080"
+    networks:
+      - go_todo_api
+networks:
+  go_todo_api:
