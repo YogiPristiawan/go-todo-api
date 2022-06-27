@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/YogiPristiawan/go-todo-api/applications/use_case"
 	"github.com/YogiPristiawan/go-todo-api/domains"
 	"github.com/YogiPristiawan/go-todo-api/domains/auth"
@@ -20,14 +18,9 @@ import (
 	"github.com/YogiPristiawan/go-todo-api/infrastructures/validator/translate"
 	"github.com/YogiPristiawan/go-todo-api/interfaces/http/api"
 	"github.com/golobby/container/v3"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-	}
 	// Container
 	registerServer()
 	registerDatabase()
