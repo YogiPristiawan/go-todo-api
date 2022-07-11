@@ -1,0 +1,82 @@
+package auth
+
+import (
+	"github.com/labstack/echo/v4"
+
+	"github.com/YogiPristiawan/go-todo-api/domain/auth"
+	"github.com/YogiPristiawan/go-todo-api/modules/exceptions"
+	"github.com/YogiPristiawan/go-todo-api/modules/helper"
+	ut "github.com/go-playground/universal-translator"
+	"github.com/go-playground/validator/v10"
+)
+
+type AuthHandler struct {
+	UseCase              auth.AuthUseCase
+	Validator            *validator.Validate
+	ValidatorTranslation ut.Translator
+}
+
+func (a *AuthHandler) Login(c echo.Context) error {
+	// collect payload
+	l := new(auth.LoginRequest)
+	if err := (&echo.DefaultBinder{}).BindBody(c, l); err != nil {
+		return helper.HandleError(c, err)
+	}
+
+	// validate payload
+	if err := a.Validator.Struct(l); err != nil {
+		if he, ok := err.(validator.ValidationErrors); ok {
+			errors := he.Translate(a.ValidatorTranslation)
+
+			for _, val := range errors {
+				return helper.HandleError(c, exceptions.NewInvariantError(val))
+			}
+		}
+	}
+
+	payload := &auth.LoginRequest{
+		Username: l.Username,
+		Password: l.Password,
+	}
+
+	result, err := a.UseCase.Login(payload)
+	if err != nil {
+		return helper.HandleError(c, exceptions.NewInvariantError(err.Error()))
+	}
+
+	return helper.ResponseJsonHttpOk(c, "login success", result)
+}
+
+func (a *AuthHandler) Register(c echo.Context) error {
+	// collect payload
+	r := new(auth.RegisterRequest)
+	if err := (&echo.DefaultBinder{}).BindBody(c, r); err != nil {
+		return helper.HandleError(c, err)
+	}
+
+	// validate payload
+	if err := a.Validator.Struct(r); err != nil {
+		if he, ok := err.(validator.ValidationErrors); ok {
+			errors := he.Translate(a.ValidatorTranslation)
+
+			for _, val := range errors {
+				return helper.HandleError(c, exceptions.NewInvariantError(val))
+			}
+		}
+	}
+
+	payload := &auth.RegisterRequest{
+		Username:  r.Username,
+		Password:  r.Password,
+		Gender:    r.Gender,
+		BirthDate: r.BirthDate,
+	}
+
+	result, err := a.UseCase.Register(payload)
+	if err != nil {
+		return helper.HandleError(c, err)
+	}
+
+	return helper.ResponseJsonCreated(c, "register success", result)
+
+}

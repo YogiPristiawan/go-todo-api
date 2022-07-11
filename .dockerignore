@@ -1,3 +1,4 @@
 .vscode
 /tmp
 .git
+.env

@@ -1,13 +1,34 @@
 version: "3"
-services:
+services:  
+  mysql:
+    image: mysql:8.0.29-oracle
+    container_name: mysql
+    volumes:
+      - /var/lib/mysql:/var/lib/mysql
+    networks:
+      - go_todo_api
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: mysqladmin ping -h localhost -u ${DB_USERNAME} -p${DB_PASSWORD}
+      start_period: 10s
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    env_file:
+      - .env
   app:
-    image: yogipristiawan/go-todo-api:${APP_VERSION:-v1}
+    image: yogipristiawan/go-todo-api:v1
     container_name: go-todo-api
     env_file: 
       - .env
     ports:
       - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks:
       - go_todo_api
+    restart: on-failure
 networks:
   go_todo_api:
