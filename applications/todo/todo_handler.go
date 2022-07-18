@@ -1,9 +1,6 @@
 package todo
 
 import (
-	"strconv"
-	"strings"
-
 	"github.com/YogiPristiawan/go-todo-api/domain/todo"
 	"github.com/YogiPristiawan/go-todo-api/modules/exceptions"
 	"github.com/YogiPristiawan/go-todo-api/modules/helper"
@@ -19,6 +16,7 @@ type TodoHandler struct {
 }
 
 func (t *TodoHandler) Store(c echo.Context) error {
+	// collect payload
 	r := new(todo.StoreTodoRequest)
 	if err := (&echo.DefaultBinder{}).BindBody(c, r); err != nil {
 		return helper.HandleError(c, exceptions.NewInvariantError(err.Error()))
@@ -26,25 +24,19 @@ func (t *TodoHandler) Store(c echo.Context) error {
 
 	// validate payload
 	if err := t.Validator.Struct(r); err != nil {
-		if he, ok := err.(validator.ValidationErrors); ok {
-			errors := he.Translate(t.ValidatorTranslation)
-
-			for _, val := range errors {
-				return helper.HandleError(c, exceptions.NewInvariantError(val))
-			}
-		}
+		err = helper.ValidatorErrorTranslate(err, t.ValidatorTranslation)
+		return helper.HandleError(c, err)
 	}
 
 	// get authenticated user
-	header := c.Request().Header.Get("Authorization")
-	token := strings.Split(header, " ")[1]
-	claims, err := helper.DecodeAccessToken(token)
+	auth, err := helper.DecodeAuthJwtPayload(c)
 	if err != nil {
-		return helper.HandleError(c, exceptions.NewAuthenticationError(err.Error()))
+		return helper.HandleError(c, err)
 	}
 
+	// call use case
 	result, err := t.UseCase.Store(&todo.StoreTodoRequest{
-		UserId:     claims.UserId,
+		UserId:     auth.UserId,
 		Todo:       r.Todo,
 		Date:       r.Date,
 		IsFinished: r.IsFinished,
@@ -57,14 +49,14 @@ func (t *TodoHandler) Store(c echo.Context) error {
 }
 
 func (t *TodoHandler) GetByUserId(c echo.Context) error {
-	// get header
-	authorizationHeader := c.Request().Header.Get("Authorization")
-	token := strings.Split(authorizationHeader, " ")[1]
-	claims, err := helper.DecodeAccessToken(token)
+	// get authenticated user
+	auth, err := helper.DecodeAuthJwtPayload(c)
 	if err != nil {
-		return helper.HandleError(c, exceptions.NewAuthenticationError(err.Error()))
+		return helper.HandleError(c, err)
 	}
-	result, err := t.UseCase.GetByUserId(claims.UserId)
+
+	// call use case
+	result, err := t.UseCase.GetByUserId(auth.UserId)
 	if err != nil {
 		return helper.HandleError(c, err)
 	}
@@ -72,43 +64,59 @@ func (t *TodoHandler) GetByUserId(c echo.Context) error {
 	return helper.ResponseJsonHttpOk(c, "success", result)
 }
 
-func (t *TodoHandler) UpdateById(c echo.Context) error {
-	// collect parameter
-	todoId, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return helper.HandleError(c, exceptions.NewInvariantError("Paramter must be a valid number"))
-	}
-
-	// collect payload
-	r := new(todo.UpdateTodoRequest)
-	if err := (&echo.DefaultBinder{}).BindBody(c, r); err != nil {
-		return helper.HandleError(c, exceptions.NewInvariantError(err.Error()))
-	}
-
-	// validdate payload
-	if err := t.Validator.Struct(r); err != nil {
-		if he, ok := err.(validator.ValidationErrors); ok {
-			errors := he.Translate(t.ValidatorTranslation)
-
-			for _, val := range errors {
-				return helper.HandleError(c, exceptions.NewInvariantError(val))
-			}
-		}
-	}
-
+func (t *TodoHandler) DetailById(c echo.Context) error {
 	// get authenticated user
-	headerAuthorization := c.Request().Header.Get("Authorization")
-	token := strings.Split(headerAuthorization, " ")[1]
-	claims, err := helper.DecodeAccessToken(token)
+	auth, err := helper.DecodeAuthJwtPayload(c)
 	if err != nil {
-		return helper.HandleError(c, exceptions.NewAuthenticationError(err.Error()))
+		return helper.HandleError(c, err)
+	}
+
+	// collect param
+	todoId, err := helper.CollectParamUint(c, "id")
+	if err != nil {
+		return helper.HandleError(c, err)
 	}
 
 	// call use case
-	result, err := t.UseCase.UpdateById(claims.UserId, uint(todoId), &todo.UpdateTodoRequest{
-		Todo:       r.Todo,
-		Date:       r.Date,
-		IsFinished: r.IsFinished,
+	result, err := t.UseCase.DetailById(auth.UserId, uint(todoId))
+	if err != nil {
+		return helper.HandleError(c, err)
+	}
+
+	return helper.ResponseJsonHttpOk(c, "succcess", result)
+}
+
+func (t *TodoHandler) UpdateById(c echo.Context) error {
+	// collect parameter
+	todoId, err := helper.CollectParamUint(c, "id")
+	if err != nil {
+		return helper.HandleError(c, err)
+	}
+
+	// collect paylaod
+	body := new(todo.UpdateTodoRequest)
+	err = (&echo.DefaultBinder{}).BindBody(c, body)
+	if err != nil {
+		return helper.HandleError(c, err)
+	}
+
+	// validate paylaod
+	if err := t.Validator.Struct(body); err != nil {
+		err = helper.ValidatorErrorTranslate(err, t.ValidatorTranslation)
+		return helper.HandleError(c, err)
+	}
+
+	// get authenticated user
+	auth, err := helper.DecodeAuthJwtPayload(c)
+	if err != nil {
+		return helper.HandleError(c, err)
+	}
+
+	// call use case
+	result, err := t.UseCase.UpdateById(auth.UserId, uint(todoId), &todo.UpdateTodoRequest{
+		Todo:       body.Todo,
+		Date:       body.Date,
+		IsFinished: body.IsFinished,
 	})
 	if err != nil {
 		return helper.HandleError(c, err)
@@ -119,21 +127,19 @@ func (t *TodoHandler) UpdateById(c echo.Context) error {
 
 func (t *TodoHandler) DeleteById(c echo.Context) error {
 	// collect parameter
-	todoId, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	todoId, err := helper.CollectParamUint(c, "id")
 	if err != nil {
-		return helper.HandleError(c, exceptions.NewInvariantError("Paramter must be a valid number"))
+		return helper.HandleError(c, err)
 	}
 
 	// get authenticated user
-	headerAuthorization := c.Request().Header.Get("Authorization")
-	token := strings.Split(headerAuthorization, " ")[1]
-	claims, err := helper.DecodeAccessToken(token)
+	auth, err := helper.DecodeAuthJwtPayload(c)
 	if err != nil {
-		return helper.HandleError(c, exceptions.NewAuthenticationError(err.Error()))
+		return helper.HandleError(c, err)
 	}
 
 	// call use case
-	err = t.UseCase.DeleteById(claims.UserId, uint(todoId))
+	err = t.UseCase.DeleteById(auth.UserId, uint(todoId))
 	if err != nil {
 		return helper.HandleError(c, err)
 	}

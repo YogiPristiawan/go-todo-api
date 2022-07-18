@@ -37,6 +37,17 @@ func (t *TodoUseCase) GetByUserId(userId uint) ([]*todo.GetTodosResponse, error)
 	return todo.MapGetTodosResponse(result), nil
 }
 
+func (t *TodoUseCase) DetailById(userId uint, todoId uint) (*todo.DetailTodoResponse, error) {
+	err := t.TodoRepository.VerifyTodoAccess(userId, todoId)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := t.TodoRepository.FindById(todoId)
+
+	return todo.MapDetailTodoReponse(result), nil
+}
+
 func (t *TodoUseCase) UpdateById(
 	authUserId uint,
 	todoId uint,

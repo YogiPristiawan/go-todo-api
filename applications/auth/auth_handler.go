@@ -25,21 +25,15 @@ func (a *AuthHandler) Login(c echo.Context) error {
 
 	// validate payload
 	if err := a.Validator.Struct(l); err != nil {
-		if he, ok := err.(validator.ValidationErrors); ok {
-			errors := he.Translate(a.ValidatorTranslation)
-
-			for _, val := range errors {
-				return helper.HandleError(c, exceptions.NewInvariantError(val))
-			}
-		}
+		err = helper.ValidatorErrorTranslate(err, a.ValidatorTranslation)
+		return helper.HandleError(c, err)
 	}
 
-	payload := &auth.LoginRequest{
+	// call use case
+	result, err := a.UseCase.Login(&auth.LoginRequest{
 		Username: l.Username,
 		Password: l.Password,
-	}
-
-	result, err := a.UseCase.Login(payload)
+	})
 	if err != nil {
 		return helper.HandleError(c, exceptions.NewInvariantError(err.Error()))
 	}
@@ -56,23 +50,17 @@ func (a *AuthHandler) Register(c echo.Context) error {
 
 	// validate payload
 	if err := a.Validator.Struct(r); err != nil {
-		if he, ok := err.(validator.ValidationErrors); ok {
-			errors := he.Translate(a.ValidatorTranslation)
-
-			for _, val := range errors {
-				return helper.HandleError(c, exceptions.NewInvariantError(val))
-			}
-		}
+		err = helper.ValidatorErrorTranslate(err, a.ValidatorTranslation)
+		return helper.HandleError(c, err)
 	}
 
-	payload := &auth.RegisterRequest{
+	// call use case
+	result, err := a.UseCase.Register(&auth.RegisterRequest{
 		Username:  r.Username,
 		Password:  r.Password,
 		Gender:    r.Gender,
 		BirthDate: r.BirthDate,
-	}
-
-	result, err := a.UseCase.Register(payload)
+	})
 	if err != nil {
 		return helper.HandleError(c, err)
 	}

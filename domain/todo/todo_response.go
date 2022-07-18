@@ -1,11 +1,13 @@
 package todo
 
-import "time"
+import (
+	"time"
+)
 
 type GetTodosResponse struct {
 	ID         uint   `json:"id"`
 	Todo       string `json:"todo"`
-	IsFinished *bool  `json:"is_finished"`
+	IsFinished bool   `json:"is_finished"`
 	Date       string `json:"date"`
 	CreatedAt  int64  `json:"created_at"`
 }
@@ -30,10 +32,28 @@ func MapGetTodosResponse(todos []*TodoModel) []*GetTodosResponse {
 	return todo
 }
 
+type DetailTodoResponse struct {
+	ID         uint   `json:"id"`
+	Todo       string `json:"todo"`
+	IsFinished bool   `json:"is_finished"`
+	Date       string `json:"date"`
+	CreatedAt  int64  `json:"created_at"`
+}
+
+func MapDetailTodoReponse(todo *TodoModel) *DetailTodoResponse {
+	return &DetailTodoResponse{
+		ID:         todo.ID,
+		Todo:       todo.Todo,
+		IsFinished: todo.IsFinished,
+		Date:       todo.Date,
+		CreatedAt:  todo.CreatedAt,
+	}
+}
+
 type StoreTodoResponse struct {
 	Todo       string `json:"todo"`
 	Date       string `json:"date"`
-	IsFinished *bool  `json:"is_finished"`
+	IsFinished bool   `json:"is_finished"`
 	CreatedAt  int64  `json:"created_at"`
 	UpdatedAt  int64  `json:"updated_at"`
 }
@@ -52,7 +72,7 @@ type UpdateTodoResponse struct {
 	ID         uint   `json:"id"`
 	Todo       string `json:"todo"`
 	Date       string `json:"date"`
-	IsFinished *bool  `json:"is_finished"`
+	IsFinished bool   `json:"is_finished"`
 	UpdatedAt  string `json:"updated_at"`
 }
 
@@ -62,6 +82,6 @@ func MapUpdateTodoResponse(todo *TodoModel) *UpdateTodoResponse {
 		Todo:       todo.Todo,
 		Date:       todo.Date,
 		IsFinished: todo.IsFinished,
-		UpdatedAt:  time.Unix(todo.UpdatedAt, 0).UTC().String(),
+		UpdatedAt:  time.Unix(int64(todo.UpdatedAt), 0).UTC().String(),
 	}
 }

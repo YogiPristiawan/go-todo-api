@@ -21,6 +21,7 @@ func CreateTodoRoute(container map[string]any) {
 	g := http.Group("/todos")
 	g.POST("", handler.Store, authMiddleware)
 	g.GET("", handler.GetByUserId, authMiddleware)
+	g.GET("/:id", handler.DetailById, authMiddleware)
 	g.PUT("/:id", handler.UpdateById, authMiddleware)
 	g.DELETE("/:id", handler.DeleteById, authMiddleware)
 }
