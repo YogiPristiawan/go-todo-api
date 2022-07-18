@@ -16,3 +16,15 @@ func (ns *NullString) MarshalJSON() ([]byte, error) {
 
 	return json.Marshal(ns.String)
 }
+
+type NullBool struct {
+	sql.NullBool
+}
+
+func (nb *NullBool) MarshalJSON() ([]byte, error) {
+	if !nb.Valid {
+		return []byte("null"), nil
+	}
+
+	return json.Marshal(nb.Bool)
+}

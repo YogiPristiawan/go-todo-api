@@ -1,7 +1,7 @@
 package helper
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/YogiPristiawan/go-todo-api/modules/exceptions"
 	"github.com/labstack/echo/v4"
@@ -22,7 +22,7 @@ func HandleError(c echo.Context, err error) error {
 		he, _ := err.(*exceptions.NotFoundError)
 		return ResponseJsonNotFoundError(c, he.Message)
 	default:
-		fmt.Println(err)
+		log.Fatal(err)
 		return ResponseJsonServerError(c)
 	}
 }

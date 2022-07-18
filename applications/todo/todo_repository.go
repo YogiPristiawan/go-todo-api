@@ -37,6 +37,15 @@ func (t *TodoRepository) GetByUserId(userId uint) ([]*todo.TodoModel, error) {
 	return todos, nil
 }
 
+func (t *TodoRepository) FindById(todoId uint) (*todo.TodoModel, error) {
+	var todoModel *todo.TodoModel
+	if err := t.DB.Where("id = ?", todoId).Find(&todoModel).Error; err != nil {
+		return nil, exceptions.NewNotFoundError("todo not found")
+	}
+
+	return todoModel, nil
+}
+
 func (t *TodoRepository) VerifyTodoAccess(userId uint, todoId uint) error {
 	var todoModel *todo.TodoModel
 	if err := t.DB.Model(todo.TodoModel{}).Select(

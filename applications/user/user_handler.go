@@ -1,10 +1,7 @@
 package user
 
 import (
-	"strconv"
-
 	"github.com/YogiPristiawan/go-todo-api/domain/user"
-	"github.com/YogiPristiawan/go-todo-api/modules/exceptions"
 	"github.com/YogiPristiawan/go-todo-api/modules/helper"
 	"github.com/labstack/echo/v4"
 )
@@ -14,8 +11,8 @@ type UserHandler struct {
 }
 
 func (u *UserHandler) Get(c echo.Context) error {
+	// call use case
 	users, err := u.UseCase.Get()
-
 	if err != nil {
 		return helper.HandleError(c, err)
 	}
@@ -28,9 +25,10 @@ func (u *UserHandler) Get(c echo.Context) error {
 }
 
 func (u *UserHandler) FindById(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	// collect param
+	id, err := helper.CollectParamUint(c, "id")
 	if err != nil {
-		return helper.HandleError(c, exceptions.NewInvariantError("parameter harus berupa integer"))
+		return helper.HandleError(c, err)
 	}
 
 	user, err := u.UseCase.FindById(uint(id))
