@@ -1,4 +1,4 @@
-package user
+package handler
 
 import (
 	"github.com/YogiPristiawan/go-todo-api/domain/user"
@@ -8,6 +8,12 @@ import (
 
 type UserHandler struct {
 	UseCase user.UserUseCase
+}
+
+func NewUserHandler(useCase user.UserUseCase) *UserHandler {
+	return &UserHandler{
+		UseCase: useCase,
+	}
 }
 
 func (u *UserHandler) Get(c echo.Context) error {

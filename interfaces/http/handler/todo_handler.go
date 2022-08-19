@@ -1,4 +1,4 @@
-package todo
+package handler
 
 import (
 	"github.com/YogiPristiawan/go-todo-api/domain/todo"
@@ -13,6 +13,18 @@ type TodoHandler struct {
 	UseCase              todo.TodoUseCase
 	Validator            *validator.Validate
 	ValidatorTranslation ut.Translator
+}
+
+func NewTodoHandler(
+	useCase todo.TodoUseCase,
+	validator *validator.Validate,
+	translator ut.Translator,
+) *TodoHandler {
+	return &TodoHandler{
+		UseCase:              useCase,
+		Validator:            validator,
+		ValidatorTranslation: translator,
+	}
 }
 
 func (t *TodoHandler) Store(c echo.Context) error {

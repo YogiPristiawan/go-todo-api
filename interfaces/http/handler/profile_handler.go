@@ -1,4 +1,4 @@
-package profile
+package handler
 
 import (
 	"github.com/YogiPristiawan/go-todo-api/domain/profile"
@@ -8,6 +8,12 @@ import (
 
 type ProfileHandler struct {
 	UseCase profile.ProfileUseCase
+}
+
+func NewProfileHandler(useCase profile.ProfileUseCase) *ProfileHandler {
+	return &ProfileHandler{
+		UseCase: useCase,
+	}
 }
 
 func (p *ProfileHandler) FindById(c echo.Context) error {

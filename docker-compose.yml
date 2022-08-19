@@ -1,7 +1,7 @@
 version: "3"
-services:  
+services:
   mysql:
-    image: mysql:8.0.29-oracle
+    image: mysql:8.0.30-oracle
     container_name: mysql
     volumes:
       - /var/lib/mysql:/var/lib/mysql
@@ -20,7 +20,7 @@ services:
   app:
     image: yogipristiawan/go-todo-api:v1
     container_name: go-todo-api
-    env_file: 
+    env_file:
       - .env
     ports:
       - "8080:8080"

@@ -5,7 +5,8 @@ import (
 	profileApp "github.com/YogiPristiawan/go-todo-api/applications/profile"
 	todoApp "github.com/YogiPristiawan/go-todo-api/applications/todo"
 	userApp "github.com/YogiPristiawan/go-todo-api/applications/user"
-	"github.com/YogiPristiawan/go-todo-api/interfaces/http/api"
+	"github.com/YogiPristiawan/go-todo-api/interfaces/http/handler"
+	"github.com/YogiPristiawan/go-todo-api/interfaces/http/routes"
 	"github.com/YogiPristiawan/go-todo-api/modules/database"
 	"github.com/YogiPristiawan/go-todo-api/modules/http"
 	"github.com/YogiPristiawan/go-todo-api/modules/middleware"
@@ -33,31 +34,19 @@ func main() {
 	profileUseCase := profileApp.NewProfileUseCase(userRepository)
 	todoUseCase := todoApp.NewTodoUseCase(todoRepository)
 
+	// register handler
+	authHandler := handler.NewAuthHandler(authUseCase, validator, validatorTranslator)
+	userHandler := handler.NewUserHandler(userUseCase)
+	profileHandler := handler.NewProfileHandler(profileUseCase)
+	todoHandler := handler.NewTodoHandler(todoUseCase, validator, validatorTranslator)
+
 	http := http.CreateServer()
 
 	// register routes
-	api.CreateAuthRoute(map[string]any{
-		"http":       http,
-		"validator":  validator,
-		"translator": validatorTranslator,
-		"useCase":    authUseCase,
-	})
-	api.CreateUserRoute(map[string]any{
-		"http":    http,
-		"useCase": userUseCase,
-	})
-	api.CreateProfileRoute(map[string]any{
-		"http":           http,
-		"authMiddleware": authMiddleware,
-		"useCase":        profileUseCase,
-	})
-	api.CreateTodoRoute(map[string]any{
-		"http":           http,
-		"authMiddleware": authMiddleware,
-		"validator":      validator,
-		"translator":     validatorTranslator,
-		"useCase":        todoUseCase,
-	})
+	routes.CreateAuthRoute(http, authHandler)
+	routes.CreateUserRoute(http, userHandler, authMiddleware)
+	routes.CreateProfileRoute(http, profileHandler, authMiddleware)
+	routes.CreateTodoRoute(http, todoHandler, authMiddleware)
 
 	// init server
 	http.Logger.Fatal(http.Start(":8080"))

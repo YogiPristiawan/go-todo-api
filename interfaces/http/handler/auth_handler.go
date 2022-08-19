@@ -1,4 +1,4 @@
-package auth
+package handler
 
 import (
 	"github.com/labstack/echo/v4"
@@ -14,6 +14,18 @@ type AuthHandler struct {
 	UseCase              auth.AuthUseCase
 	Validator            *validator.Validate
 	ValidatorTranslation ut.Translator
+}
+
+func NewAuthHandler(
+	useCase auth.AuthUseCase,
+	validator *validator.Validate,
+	translator ut.Translator,
+) *AuthHandler {
+	return &AuthHandler{
+		UseCase:              useCase,
+		Validator:            validator,
+		ValidatorTranslation: translator,
+	}
 }
 
 func (a *AuthHandler) Login(c echo.Context) error {
