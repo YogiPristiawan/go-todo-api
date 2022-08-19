@@ -11,8 +11,10 @@ services:
       - ./:/app
     networks:
       - go_todo_api
+    depends_on:
+      - mysql
   mysql:
-    image: mysql:8.0.29-oracle
+    image: mysql:8.0.30-oracle
     container_name: mysql
     volumes:
       - /var/lib/mysql:/var/lib/mysql
