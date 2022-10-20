@@ -29,6 +29,5 @@ services:
         condition: service_healthy
     networks:
       - go_todo_api
-    restart: on-failure
 networks:
   go_todo_api:
