@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/YogiPristiawan/go-todo-api/modules/exceptions"
+	"go_todo_api/modules/exceptions"
+
 	"github.com/labstack/echo/v4"
 )
 

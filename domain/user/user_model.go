@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/YogiPristiawan/go-todo-api/modules/alias"
+	"go_todo_api/modules/alias"
 )
 
 type UserModel struct {

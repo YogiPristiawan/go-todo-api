@@ -1,8 +1,8 @@
 package profile
 
 import (
-	"github.com/YogiPristiawan/go-todo-api/domain/user"
-	"github.com/YogiPristiawan/go-todo-api/modules/alias"
+	"go_todo_api/domain/user"
+	"go_todo_api/modules/alias"
 )
 
 type FindProfileResponse struct {

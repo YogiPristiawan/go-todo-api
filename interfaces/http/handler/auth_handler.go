@@ -3,9 +3,10 @@ package handler
 import (
 	"github.com/labstack/echo/v4"
 
-	"github.com/YogiPristiawan/go-todo-api/domain/auth"
-	"github.com/YogiPristiawan/go-todo-api/modules/exceptions"
-	"github.com/YogiPristiawan/go-todo-api/modules/helper"
+	"go_todo_api/domain/auth"
+	"go_todo_api/modules/exceptions"
+	"go_todo_api/modules/helper"
+
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 )

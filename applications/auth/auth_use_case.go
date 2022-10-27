@@ -3,9 +3,9 @@ package auth
 import (
 	"errors"
 
-	"github.com/YogiPristiawan/go-todo-api/domain/auth"
-	"github.com/YogiPristiawan/go-todo-api/domain/user"
-	"github.com/YogiPristiawan/go-todo-api/modules/helper"
+	"go_todo_api/domain/auth"
+	"go_todo_api/domain/user"
+	"go_todo_api/modules/helper"
 )
 
 type AuthUseCase struct {

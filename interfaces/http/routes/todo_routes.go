@@ -1,7 +1,8 @@
 package routes
 
 import (
-	"github.com/YogiPristiawan/go-todo-api/interfaces/http/handler"
+	"go_todo_api/interfaces/http/handler"
+
 	"github.com/labstack/echo/v4"
 )
 

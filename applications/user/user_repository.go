@@ -3,8 +3,9 @@ package user
 import (
 	"errors"
 
-	"github.com/YogiPristiawan/go-todo-api/domain/user"
-	"github.com/YogiPristiawan/go-todo-api/modules/exceptions"
+	"go_todo_api/domain/user"
+	"go_todo_api/modules/exceptions"
+
 	"gorm.io/gorm"
 )
 

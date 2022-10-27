@@ -1,8 +1,8 @@
 package profile
 
 import (
-	"github.com/YogiPristiawan/go-todo-api/domain/profile"
-	"github.com/YogiPristiawan/go-todo-api/domain/user"
+	"go_todo_api/domain/profile"
+	"go_todo_api/domain/user"
 )
 
 type ProfileUseCase struct {

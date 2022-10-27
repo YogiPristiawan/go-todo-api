@@ -6,7 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/YogiPristiawan/go-todo-api/modules/exceptions"
+	"go_todo_api/modules/exceptions"
+
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )

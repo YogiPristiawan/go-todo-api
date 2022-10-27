@@ -3,8 +3,9 @@ package todo
 import (
 	"errors"
 
-	"github.com/YogiPristiawan/go-todo-api/domain/todo"
-	"github.com/YogiPristiawan/go-todo-api/modules/exceptions"
+	"go_todo_api/domain/todo"
+	"go_todo_api/modules/exceptions"
+
 	"gorm.io/gorm"
 )
 

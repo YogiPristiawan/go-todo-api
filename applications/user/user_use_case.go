@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/YogiPristiawan/go-todo-api/domain/user"
+	"go_todo_api/domain/user"
 )
 
 type UserUseCase struct {

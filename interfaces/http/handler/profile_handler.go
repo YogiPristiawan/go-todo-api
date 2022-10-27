@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/YogiPristiawan/go-todo-api/domain/profile"
-	"github.com/YogiPristiawan/go-todo-api/modules/helper"
+	"go_todo_api/domain/profile"
+	"go_todo_api/modules/helper"
+
 	"github.com/labstack/echo/v4"
 )
 

@@ -1,7 +1,7 @@
 package todo
 
 import (
-	"github.com/YogiPristiawan/go-todo-api/domain/todo"
+	"go_todo_api/domain/todo"
 )
 
 type TodoUseCase struct {

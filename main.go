@@ -1,17 +1,17 @@
 package main
 
 import (
-	authApp "github.com/YogiPristiawan/go-todo-api/applications/auth"
-	profileApp "github.com/YogiPristiawan/go-todo-api/applications/profile"
-	todoApp "github.com/YogiPristiawan/go-todo-api/applications/todo"
-	userApp "github.com/YogiPristiawan/go-todo-api/applications/user"
-	"github.com/YogiPristiawan/go-todo-api/interfaces/http/handler"
-	"github.com/YogiPristiawan/go-todo-api/interfaces/http/routes"
-	"github.com/YogiPristiawan/go-todo-api/modules/database"
-	"github.com/YogiPristiawan/go-todo-api/modules/http"
-	"github.com/YogiPristiawan/go-todo-api/modules/middleware"
-	"github.com/YogiPristiawan/go-todo-api/modules/validator"
-	"github.com/YogiPristiawan/go-todo-api/modules/validator/translate"
+	authApp "go_todo_api/applications/auth"
+	profileApp "go_todo_api/applications/profile"
+	todoApp "go_todo_api/applications/todo"
+	userApp "go_todo_api/applications/user"
+	"go_todo_api/interfaces/http/handler"
+	"go_todo_api/interfaces/http/routes"
+	"go_todo_api/modules/database"
+	"go_todo_api/modules/http"
+	"go_todo_api/modules/middleware"
+	"go_todo_api/modules/validator"
+	"go_todo_api/modules/validator/translate"
 )
 
 func main() {

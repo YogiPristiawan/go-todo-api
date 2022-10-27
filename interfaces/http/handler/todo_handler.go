@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"github.com/YogiPristiawan/go-todo-api/domain/todo"
-	"github.com/YogiPristiawan/go-todo-api/modules/exceptions"
-	"github.com/YogiPristiawan/go-todo-api/modules/helper"
+	"go_todo_api/domain/todo"
+	"go_todo_api/modules/exceptions"
+	"go_todo_api/modules/helper"
+
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"

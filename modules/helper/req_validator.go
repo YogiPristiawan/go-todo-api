@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/YogiPristiawan/go-todo-api/modules/exceptions"
+	"go_todo_api/modules/exceptions"
+
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 )
