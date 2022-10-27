@@ -1,53 +1,59 @@
 package main
 
 import (
-	authApp "go_todo_api/applications/auth"
-	profileApp "go_todo_api/applications/profile"
-	todoApp "go_todo_api/applications/todo"
-	userApp "go_todo_api/applications/user"
-	"go_todo_api/interfaces/http/handler"
-	"go_todo_api/interfaces/http/routes"
-	"go_todo_api/modules/database"
-	"go_todo_api/modules/http"
-	"go_todo_api/modules/middleware"
-	"go_todo_api/modules/validator"
-	"go_todo_api/modules/validator/translate"
+	"fmt"
+	"go_todo_api/src/routes"
+	"go_todo_api/src/shared/databases"
+	"go_todo_api/src/shared/validators"
+	"log"
+	"os"
+
+	"github.com/gin-gonic/gin"
+
+	"go_todo_api/src/account"
+	accountRepo "go_todo_api/src/account/repositories"
+	accountService "go_todo_api/src/account/services"
+	accountValidator "go_todo_api/src/account/validators"
+
+	"go_todo_api/src/todo"
+	todoRepo "go_todo_api/src/todo/repositories"
+	todoService "go_todo_api/src/todo/services"
+	todoValidator "go_todo_api/src/todo/validators"
 )
 
 func main() {
+	r := gin.Default()
 
-	authMiddleware := middleware.CreateAuthMiddleware()
+	// INITIALIZE DATABASE
+	db := databases.NewPgConn()
+	defer db.Close()
 
-	mySqlDB := database.CreateMySqlConnection()
+	// INITIALIZE LIBRARIES
+	validator := validators.NewValidatorAdapter()
 
-	// register validator
-	validator := validator.CreateRequestValidator()
-	validatorTranslator := translate.CreateRequestValidatorTranslate(validator)
+	// INITIALIZE REPOSITORIES
+	accountRepoImpl := accountRepo.NewAccountRepository(db)
+	todoRepoImpl := todoRepo.NewTodoRepository(db)
 
-	// register repository
-	userRepository := userApp.NewUserRepository(mySqlDB)
-	todoRepository := todoApp.NewTodoRepository(mySqlDB)
+	// INITIALIZE VALIDATORS
+	authValidatorImpl := accountValidator.NewAuthValidator(validator)
+	todoValidatorImpl := todoValidator.NewTodoValidator(validator)
 
-	// register use case
-	userUseCase := userApp.NewUserUseCase(userRepository)
-	authUseCase := authApp.NewAuthUseCase(userRepository)
-	profileUseCase := profileApp.NewProfileUseCase(userRepository)
-	todoUseCase := todoApp.NewTodoUseCase(todoRepository)
+	// INITIALIZE SERVICES
+	authServiceImpl := accountService.NewAuthService(authValidatorImpl, accountRepoImpl)
+	accountServiceImpl := accountService.NewAccountService(accountRepoImpl)
+	todoServiceImpl := todoService.NewTodoService(todoValidatorImpl, todoRepoImpl)
 
-	// register handler
-	authHandler := handler.NewAuthHandler(authUseCase, validator, validatorTranslator)
-	userHandler := handler.NewUserHandler(userUseCase)
-	profileHandler := handler.NewProfileHandler(profileUseCase)
-	todoHandler := handler.NewTodoHandler(todoUseCase, validator, validatorTranslator)
+	// INITIALIZE CONTROLLERS
+	authControllerImpl := account.NewAuthController(authServiceImpl)
+	accountControllerImpl := account.NewAccountController(accountServiceImpl)
+	todoControllerImpl := todo.NewTodoController(todoServiceImpl)
 
-	http := http.CreateServer()
+	// INITIALIZE ROUTES
+	routes.CreateAuthRoute(r, authControllerImpl)
+	routes.CreateAccountRoute(r, accountControllerImpl)
+	routes.CreateTodoRoute(r, todoControllerImpl)
 
-	// register routes
-	routes.CreateAuthRoute(http, authHandler)
-	routes.CreateUserRoute(http, userHandler, authMiddleware)
-	routes.CreateProfileRoute(http, profileHandler, authMiddleware)
-	routes.CreateTodoRoute(http, todoHandler, authMiddleware)
+	log.Fatal(r.Run(fmt.Sprintf(":%s", os.Getenv("APP_PORT"))))
 
-	// init server
-	http.Logger.Fatal(http.Start(":8080"))
 }

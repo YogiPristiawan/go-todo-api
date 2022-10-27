@@ -31,12 +31,11 @@ func NewAccountController(service services.AccountService) AccountController {
 // GetProfile handle request to get authenticated
 // user profile using JWT token
 func (a *accountController) GetProfile(c *gin.Context) {
-	in := dto.ProfileRequest{}
-
-	if err := presentation.ReadRestIn(c, &in); err != nil {
-		o := entities.CommonResult{}
-		presentation.WriteRestOut(c, o, o)
-		return
+	authUserId, _ := c.Get("auth_user_id")
+	in := dto.ProfileRequest{
+		RequestMetaData: entities.RequestMetaData{
+			AuthUserId: authUserId.(int64),
+		},
 	}
 
 	out := a.service.GetProfile(in)

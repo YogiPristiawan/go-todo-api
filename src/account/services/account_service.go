@@ -29,7 +29,8 @@ func NewAccountService(accountRepo repositories.AccountRepository) AccountServic
 // GetProfile handle an action to show authenticated
 // user profile data
 func (a *accountService) GetProfile(in dto.ProfileRequest) (out entities.BaseResponse[dto.ProfileResponse]) {
-	profile, err := a.accountRepo.GetProfileByUserId(in.UserId)
+	profile, err := a.accountRepo.GetProfileByUserId(in.AuthUserId)
+
 	switch wrapDBErr(err) {
 	case 404:
 		out.SetResponse(404, fmt.Errorf("profile not found"))

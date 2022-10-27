@@ -48,8 +48,10 @@ func (a *authService) Login(in dto.LoginRequest) (out entities.BaseResponse[dto.
 	switch wrapDBErr(err) {
 	case 404:
 		out.SetResponse(404, fmt.Errorf("username tidak ditemukan"))
+		return
 	case 500:
 		out.SetResponse(500, err)
+		return
 	}
 
 	// compare password

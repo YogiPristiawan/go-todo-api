@@ -45,7 +45,7 @@ func (t *todoService) Store(in dto.StoreTodoRequest) (out entities.BaseResponse[
 
 	// create todo data to store into database
 	todo := models.Todo{
-		UserId:     in.RequestMetaData.UserId,
+		UserId:     in.RequestMetaData.AuthUserId,
 		Todo:       in.Todo,
 		Date:       in.Date,
 		IsFinished: in.IsFinished,
@@ -67,7 +67,7 @@ func (t *todoService) Store(in dto.StoreTodoRequest) (out entities.BaseResponse[
 // Find handle business logic action to find user todo datas
 func (t *todoService) Find(in dto.FindTodoRequest) (out entities.BaseResponseArray[dto.FindTodoResponse]) {
 	// find todo data
-	todos, err := t.todoRepo.Find(in.UserId)
+	todos, err := t.todoRepo.Find(in.AuthUserId)
 	switch wrapDBErr(err) {
 	case 404:
 		out.SetResponse(404, fmt.Errorf("todo not found"))
@@ -92,7 +92,7 @@ func (t *todoService) Detail(in dto.DetailTodoRequest) (out entities.BaseRespons
 	}
 
 	// get todo detail
-	todo, err := t.todoRepo.Detail(in.UserId, in.Id)
+	todo, err := t.todoRepo.Detail(in.AuthUserId, in.Id)
 	switch wrapDBErr(err) {
 	case 404:
 		out.SetResponse(404, fmt.Errorf("todo data not found"))

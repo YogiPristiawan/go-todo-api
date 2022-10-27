@@ -24,8 +24,12 @@ type accountRepository struct {
 }
 
 // NewAccountRepository creates an instance of accountRepository
-func NewAccountRepository() AccountRepository {
-	return &accountRepository{}
+func NewAccountRepository(
+	db databases.DB,
+) AccountRepository {
+	return &accountRepository{
+		db: db,
+	}
 }
 
 // GetByUsername provide user account data
@@ -54,7 +58,7 @@ func (a *accountRepository) Create(account *models.Account) error {
 	)
 	VALUES
 	(
-		$1, $2, $3 $4, $5, $6
+		$1, $2, $3, $4, $5, $6
 	) RETURNING id, username, password, gender, birth_date, created_at, updated_at`
 
 	// create timestamps

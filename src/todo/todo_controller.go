@@ -40,7 +40,7 @@ func (t *todoController) Store(c *gin.Context) {
 	// make payload
 	in := dto.StoreTodoRequest{
 		RequestMetaData: entities.RequestMetaData{
-			UserId: authUserId.(int64),
+			AuthUserId: authUserId.(int64),
 		},
 	}
 
@@ -63,7 +63,7 @@ func (t *todoController) Find(c *gin.Context) {
 	// make payload
 	in := dto.FindTodoRequest{
 		RequestMetaData: entities.RequestMetaData{
-			UserId: authUserId.(int64),
+			AuthUserId: authUserId.(int64),
 		},
 	}
 
@@ -79,7 +79,7 @@ func (t *todoController) Detail(c *gin.Context) {
 	// make payload
 	in := dto.DetailTodoRequest{
 		RequestMetaData: entities.RequestMetaData{
-			UserId: authUserId.(int64),
+			AuthUserId: authUserId.(int64),
 		},
 	}
 

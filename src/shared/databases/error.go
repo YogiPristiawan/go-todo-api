@@ -9,8 +9,11 @@ import (
 // WrapError convert database error type
 // into http response code
 func WrapError(err error) (code int) {
-	if errors.Is(err, pgx.ErrNoRows) {
-		return 404
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return 404
+		}
+		return 500
 	}
-	return 500
+	return
 }

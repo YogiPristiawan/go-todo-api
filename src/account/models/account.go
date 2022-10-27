@@ -19,6 +19,6 @@ type Account struct {
 type Profile struct {
 	Id        int64
 	Username  string
-	Gender    string
-	BirthDate string
+	Gender    entities.String
+	BirthDate entities.String
 }

@@ -29,7 +29,7 @@ func (c *CommonResult) SetResponse(code int, err error) {
 
 	if code >= 500 { // server error
 		// send to logger
-		log.Println(errors.WithStack(err))
+		log.Println("ERROR", errors.WithStack(err))
 		c.message = "inernal server error"
 	}
 }
