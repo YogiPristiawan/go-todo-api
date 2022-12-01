@@ -42,7 +42,7 @@ func (a *authService) Login(in dto.LoginRequest) (out entities.BaseResponse[dto.
 		out.SetResponse(400, err)
 		return
 	}
-
+	fmt.Println("MASUK SINI")
 	// get user by username if already exists
 	user, err := a.accountRepo.GetByUsername(in.Username)
 	switch wrapDBErr(err) {

@@ -2,7 +2,8 @@ package validators
 
 import (
 	"go_todo_api/src/account/dto"
-	"go_todo_api/src/shared/validators"
+
+	"github.com/go-playground/validator/v10"
 )
 
 // AuthValidator is an abstract that contains methods
@@ -15,19 +16,19 @@ type AuthValidator interface {
 // authValidator provides methods to handle
 // auth-related validation
 type authValidator struct {
-	validator validators.Validate
+	validator *validator.Validate
 }
 
 // NewAuthValidator creates an instance of
 // AuthValidator
-func NewAuthValidator(validator validators.Validate) AuthValidator {
+func NewAuthValidator(validator *validator.Validate) AuthValidator {
 	return &authValidator{
 		validator: validator,
 	}
 }
 
 func (a *authValidator) ValidateLogin(in dto.LoginRequest) error {
-	return customErrorMsg(a.validator.Struct(in))
+	return customErrorMsg(a.validator.Struct(&in))
 }
 
 func (a *authValidator) ValidateRegister(in dto.RegisterRequest) error {

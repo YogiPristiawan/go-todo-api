@@ -4,8 +4,8 @@ import "go_todo_api/src/shared/entities"
 
 // LoginRequest provides data struct of login request
 type LoginRequest struct {
-	Username string `json:"username" validate:"requried,username"`
-	Password string `json:"password" validate:"requred,min=6"`
+	Username string `json:"username" validate:"required,username"`
+	Password string `json:"password" validate:"required,min=6"`
 }
 
 // LoginResponse provides data struct of login response

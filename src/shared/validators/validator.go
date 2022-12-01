@@ -6,10 +6,18 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-// Validate is an abstract that contains methods
-// to handle validations
-type Validate interface {
-	Struct(interface{}) error
+// ValidatorError is a custom error
+// to indicate that tyhe error type is from validator
+type ValidatorError struct {
+	Err error
+}
+
+func (v *ValidatorError) Error() string {
+	return fmt.Sprintf("%v", v.Err)
+}
+
+func (v *ValidatorError) Unwrap() error {
+	return v.Err
 }
 
 // CustomErrorMessage make custom validator error message
@@ -18,9 +26,22 @@ func CustomErrorMessage(vError error) error {
 		for _, vError := range obj {
 			switch vError.Tag() {
 			case "username":
-				return fmt.Errorf("%s invalid", vError.Field())
+				return &ValidatorError{
+					Err: fmt.Errorf("%s invalid", vError.Field()),
+				}
+			default:
+				return &ValidatorError{
+					Err: fmt.Errorf("%v", vError.Error()),
+				}
 			}
 		}
 	}
+
+	if val, ok := vError.(*validator.InvalidValidationError); ok {
+		fmt.Println(val.Type)
+	} else {
+		fmt.Println("BUKAN")
+	}
+
 	return nil
 }

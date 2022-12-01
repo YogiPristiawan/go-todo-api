@@ -29,7 +29,7 @@ func main() {
 	defer db.Close()
 
 	// INITIALIZE LIBRARIES
-	validator := validators.NewValidatorAdapter()
+	validator := validators.NewValidator()
 
 	// INITIALIZE REPOSITORIES
 	accountRepoImpl := accountRepo.NewAccountRepository(db)
