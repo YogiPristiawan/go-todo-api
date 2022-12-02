@@ -13,7 +13,7 @@ import (
 func NewValidator() *validator.Validate {
 	v := validator.New()
 	v.RegisterValidation("username", validateUsername)
-	v.RegisterCustomTypeFunc(validateValuer, entities.String{})
+	v.RegisterCustomTypeFunc(validateValuer, entities.String{}, entities.Date{})
 
 	return v
 }

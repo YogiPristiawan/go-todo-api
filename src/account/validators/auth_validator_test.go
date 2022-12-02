@@ -1,11 +1,9 @@
 package validators
 
 import (
-	"fmt"
 	"go_todo_api/src/account/dto"
 	"go_todo_api/src/shared/entities"
 	"go_todo_api/src/shared/validators"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -268,7 +266,7 @@ func TestValdiateRegister(t *testing.T) {
 		// action & assert
 		for _, test := range negatives {
 			err := authValidator.ValidateRegister(test.param)
-			fmt.Println(reflect.TypeOf(err))
+
 			message := "%s"
 			message += "\nGender: %#v"
 
@@ -332,6 +330,85 @@ func TestValdiateRegister(t *testing.T) {
 				t,
 				err,
 				test.title, test.param.Gender,
+			)
+		}
+	})
+
+	t.Run("It should validate birth date", func(t *testing.T) {
+		// NEGATIVE
+		// arrange
+		negatives := []test{
+			{
+				title: "Should return error if the given birth date format is invalid",
+				param: dto.RegisterRequest{
+					Username:  "foo",
+					Password:  "123456778",
+					Gender:    entities.String{Valid: true, String: "L"},
+					BirthDate: entities.Date{Valid: true, String: "2022"},
+				},
+			},
+			{
+				title: "Should return error if the given birth date format is invalid",
+				param: dto.RegisterRequest{
+					Username:  "foo",
+					Password:  "123456778",
+					Gender:    entities.String{Valid: true, String: "L"},
+					BirthDate: entities.Date{Valid: true, String: "January"},
+				},
+			},
+			{
+				title: "Should return error if the given birth date format is invalid",
+				param: dto.RegisterRequest{
+					Username:  "foo",
+					Password:  "123456778",
+					Gender:    entities.String{Valid: true, String: "L"},
+					BirthDate: entities.Date{Valid: true, String: "06"},
+				},
+			},
+		}
+
+		// action & assert
+		for _, test := range negatives {
+			err := authValidator.ValidateRegister(test.param)
+
+			message := "%s"
+			message += "\nBirthDate: %#v"
+			message += "\nActualErr: %T"
+
+			assert.ErrorAsf(
+				t,
+				err,
+				&test.expectErr,
+				message, test.title, test.param.BirthDate, err,
+			)
+		}
+
+		// POSITIVE
+		// arrange
+		positives := []test{
+			{
+				title: "Should not return an error if the given birth date is valid",
+				param: dto.RegisterRequest{
+					Username:  "foo",
+					BirthDate: entities.Date{Valid: true, String: "2022-01-01"},
+					Password:  "12345678",
+					Gender:    entities.String{Valid: true, String: "L"},
+				},
+			},
+		}
+
+		// action & assert
+		for _, test := range positives {
+			err := authValidator.ValidateRegister(test.param)
+
+			message := "%s"
+			message += "\nBirthDate: %#v"
+			message += "\nActualErr: %T"
+
+			assert.Nilf(
+				t,
+				err,
+				message, test.title, test.param.BirthDate, err,
 			)
 		}
 	})

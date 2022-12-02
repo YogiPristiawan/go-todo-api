@@ -8,7 +8,7 @@ type StoreTodoRequest struct {
 	entities.RequestMetaData
 	Todo       string `json:"todo" validate:"required,max=255"`
 	Date       string `json:"date" validate:"required,datetime=2006-01-02"`
-	IsFinished bool   `json:"is_finished" validate:"required"`
+	IsFinished bool   `json:"is_finished"`
 }
 
 // StoreTodoResponse provides data struct of
@@ -45,7 +45,7 @@ type FindTodoResponse struct {
 // of todo get detail action request
 type DetailTodoRequest struct {
 	entities.RequestMetaData
-	Id int64 `uri:"id" validate:"requried"`
+	Id int64 `uri:"id" validate:"required"`
 }
 
 // DetailTodoResponse provides data struct of

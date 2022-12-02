@@ -1,8 +1,9 @@
 package validators
 
 import (
-	"go_todo_api/src/shared/validators"
 	"go_todo_api/src/todo/dto"
+
+	"github.com/go-playground/validator/v10"
 )
 
 // TodoValidator is an abstract that contains
@@ -15,11 +16,11 @@ type TodoValidator interface {
 // todoValidator is a struct that has methods
 // to validate todo data
 type todoValidator struct {
-	validator validators.Validate
+	validator *validator.Validate
 }
 
 // NewTodoValidator creates instance of todoValidator
-func NewTodoValidator(validator validators.Validate) TodoValidator {
+func NewTodoValidator(validator *validator.Validate) TodoValidator {
 	return &todoValidator{
 		validator: validator,
 	}
