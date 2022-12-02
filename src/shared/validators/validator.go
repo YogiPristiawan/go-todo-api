@@ -37,11 +37,5 @@ func CustomErrorMessage(vError error) error {
 		}
 	}
 
-	if val, ok := vError.(*validator.InvalidValidationError); ok {
-		fmt.Println(val.Type)
-	} else {
-		fmt.Println("BUKAN")
-	}
-
-	return nil
+	return vError
 }
