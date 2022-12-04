@@ -8,8 +8,12 @@ import (
 	"go_todo_api/src/shared/databases"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 // AccountRepository is an abstract contains methods
 // required to provides account data
+//
+//counterfeiter:generate . AccountRepository
 type AccountRepository interface {
 	GetByUsername(username string) (account models.Account, err error)
 	Create(account *models.Account) error

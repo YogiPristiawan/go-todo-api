@@ -20,5 +20,5 @@ type Profile struct {
 	Id        int64
 	Username  string
 	Gender    entities.String
-	BirthDate entities.String
+	BirthDate entities.Date
 }

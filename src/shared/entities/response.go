@@ -30,7 +30,7 @@ func (c *CommonResult) SetResponse(code int, err error) {
 	if code >= 500 { // server error
 		// send to logger
 		log.Println("ERROR", errors.WithStack(err))
-		c.message = "inernal server error"
+		c.message = "internal server error"
 	}
 }
 
@@ -50,7 +50,7 @@ func (c *CommonResult) GetMessage() string {
 type BaseResponse[T interface{}] struct {
 	CommonResult
 	Message string `json:"message"`
-	Data    T
+	Data    *T
 }
 
 // BaseResponseArray is a template for

@@ -40,8 +40,9 @@ func (a *accountService) GetProfile(in dto.ProfileRequest) (out entities.BaseRes
 		return
 	}
 
-	mapGetProfileToResponse(&out.Data, &profile)
-
 	out.Message = "success get user profile"
+	out.Data = &dto.ProfileResponse{}
+	mapGetProfileToResponse(out.Data, &profile)
+
 	return
 }
