@@ -6,8 +6,12 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 // AuthValidator is an abstract that contains methods
 // required to handle auth-related validation
+//
+//counterfeiter:generate . AuthValidator
 type AuthValidator interface {
 	ValidateLogin(in dto.LoginRequest) error
 	ValidateRegister(in dto.RegisterRequest) error

@@ -25,14 +25,6 @@ func TestNewAccountService(t *testing.T) {
 	})
 }
 
-type mockError struct {
-	code int
-}
-
-func (h *mockError) Error() string {
-	return ""
-}
-
 func TestGetProfile(t *testing.T) {
 	type test struct {
 		title  string

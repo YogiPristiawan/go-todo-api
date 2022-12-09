@@ -9,6 +9,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// mockError is a struct to mock an error, for testing purpose
+type mockError struct {
+	code int
+}
+
+func (h *mockError) Error() string {
+	return ""
+}
+
 // this variables store helper function
 // for easier testing
 var wrapDBErr = databases.WrapError

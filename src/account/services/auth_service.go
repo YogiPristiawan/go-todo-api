@@ -42,7 +42,7 @@ func (a *authService) Login(in dto.LoginRequest) (out entities.BaseResponse[dto.
 		out.SetResponse(400, err)
 		return
 	}
-	fmt.Println("MASUK SINI")
+
 	// get user by username if already exists
 	user, err := a.accountRepo.GetByUsername(in.Username)
 	switch wrapDBErr(err) {
@@ -57,6 +57,7 @@ func (a *authService) Login(in dto.LoginRequest) (out entities.BaseResponse[dto.
 	// compare password
 	if err := comparePassword(user.Password, in.Password); err != nil {
 		out.SetResponse(401, fmt.Errorf("password tidak sesuai"))
+		return
 	}
 
 	// generate access token
