@@ -6,6 +6,15 @@ import (
 	"go_todo_api/src/todo/models"
 )
 
+// mockError is a struct to mock an error, for testing purpose
+type mockError struct {
+	code int
+}
+
+func (m *mockError) Error() string {
+	return ""
+}
+
 // this variables store helper functions
 // to easier testing
 var wrapDBErr = databases.WrapError

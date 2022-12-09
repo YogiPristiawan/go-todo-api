@@ -7,8 +7,12 @@ import (
 	"time"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 // TodoRepository is an abstract that contains
 // methods to manipulate todo data
+//
+//counterfeiter:generate . TodoRepository
 type TodoRepository interface {
 	Store(todo *models.Todo) error
 	Find(userId int64) (todos []models.Todo, err error)

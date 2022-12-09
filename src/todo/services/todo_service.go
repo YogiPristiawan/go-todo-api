@@ -57,10 +57,11 @@ func (t *todoService) Store(in dto.StoreTodoRequest) (out entities.BaseResponse[
 		return
 	}
 
-	mapStoreToResponse(&out.Data, &todo)
+	out.Data = &dto.StoreTodoResponse{}
+	mapStoreToResponse(out.Data, &todo)
 
 	out.Message = "todo created"
-	out.SetResponse(201, nil)
+	out.SetResponse(201, nil, "todo created")
 	return
 }
 
@@ -102,7 +103,8 @@ func (t *todoService) Detail(in dto.DetailTodoRequest) (out entities.BaseRespons
 		return
 	}
 
-	mapDetailToResponse(&out.Data, todo)
+	out.Data = &dto.DetailTodoResponse{}
+	mapDetailToResponse(out.Data, todo)
 
 	out.Message = "detail of todo"
 	return

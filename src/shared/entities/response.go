@@ -15,7 +15,7 @@ type CommonResult struct {
 }
 
 // SetResponse set the response code, and error if exists
-func (c *CommonResult) SetResponse(code int, err error) {
+func (c *CommonResult) SetResponse(code int, err error, message ...string) {
 	c.code = code
 
 	if code >= 400 && code < 500 { // client error
@@ -25,6 +25,10 @@ func (c *CommonResult) SetResponse(code int, err error) {
 			c.message = "client error"
 		}
 		return
+	}
+
+	if len(message) > 0 {
+		c.message = message[0]
 	}
 
 	if code >= 500 { // server error

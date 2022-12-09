@@ -6,8 +6,12 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 // TodoValidator is an abstract that contains
 // methods to validate todo data
+//
+//counterfeiter:generate . TodoValidator
 type TodoValidator interface {
 	ValidateStore(in dto.StoreTodoRequest) error
 	ValidateDetail(in dto.DetailTodoRequest) error
