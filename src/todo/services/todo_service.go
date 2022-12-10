@@ -80,7 +80,7 @@ func (t *todoService) Find(in dto.FindTodoRequest) (out entities.BaseResponseArr
 
 	mapFindToResponse(&out.Data, todos)
 
-	out.Message = "list of todos"
+	out.SetResponse(200, nil, "list of todos")
 	return
 }
 
@@ -96,7 +96,7 @@ func (t *todoService) Detail(in dto.DetailTodoRequest) (out entities.BaseRespons
 	todo, err := t.todoRepo.Detail(in.AuthUserId, in.Id)
 	switch wrapDBErr(err) {
 	case 404:
-		out.SetResponse(404, fmt.Errorf("todo data not found"))
+		out.SetResponse(404, fmt.Errorf("todo is not found"))
 		return
 	case 500:
 		out.SetResponse(500, err)
@@ -106,6 +106,6 @@ func (t *todoService) Detail(in dto.DetailTodoRequest) (out entities.BaseRespons
 	out.Data = &dto.DetailTodoResponse{}
 	mapDetailToResponse(out.Data, todo)
 
-	out.Message = "detail of todo"
+	out.SetResponse(200, nil, "detail of todo")
 	return
 }
