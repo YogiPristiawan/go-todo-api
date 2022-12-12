@@ -4,13 +4,21 @@ import (
 	"go_todo_api/src/account/dto"
 	"go_todo_api/src/shared/entities"
 	"go_todo_api/src/shared/validators"
-	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestNewAuthValidator(t *testing.T) {
-	t.Run("it should properly instantiate authValidator", func(t *testing.T) {
+type AuthValidatorTestSuite struct {
+	suite.Suite
+	authValidator AuthValidator
+}
+
+func (s *AuthValidatorTestSuite) SetupSuite() {
+	s.authValidator = NewAuthValidator(validators.NewValidator())
+}
+
+func (s *AuthValidatorTestSuite) TestNewAuthValidator() {
+	s.Run("it should properly instantiate authValidator", func() {
 		// arrange
 		validator := validators.NewValidator()
 
@@ -18,12 +26,12 @@ func TestNewAuthValidator(t *testing.T) {
 		authValidator := NewAuthValidator(validator)
 
 		// asert
-		assert.IsType(t, (AuthValidator)(authValidator), authValidator)
-		assert.Implements(t, (*AuthValidator)(nil), authValidator)
+		s.Assert().IsType((AuthValidator)(authValidator), authValidator)
+		s.Assert().Implements((*AuthValidator)(nil), authValidator)
 	})
 }
 
-func TestValidateLogin(t *testing.T) {
+func (s *AuthValidatorTestSuite) TestValidateLogin() {
 	type test struct {
 		title     string
 		param     dto.LoginRequest
@@ -31,10 +39,7 @@ func TestValidateLogin(t *testing.T) {
 	}
 
 	// arange
-	validator := validators.NewValidator()
-	authValidator := NewAuthValidator(validator)
-
-	t.Run("It should validate username", func(t *testing.T) {
+	s.Run("It should validate username", func() {
 		tests := []test{
 			{
 				title: "Should return an error when username is not provided",
@@ -53,13 +58,13 @@ func TestValidateLogin(t *testing.T) {
 
 		// assert
 		for _, test := range tests {
-			err := authValidator.ValidateLogin(test.param)
+			err := s.authValidator.ValidateLogin(test.param)
 
 			message := "%s"
 			message += "\nUsername: %s"
 			message += "\nPassword: %s"
 
-			assert.ErrorAsf(t,
+			s.Assert().ErrorAsf(
 				err,
 				&test.expectErr,
 				message,
@@ -68,7 +73,7 @@ func TestValidateLogin(t *testing.T) {
 		}
 	})
 
-	t.Run("It should vaildate password", func(t *testing.T) {
+	s.Run("It should vaildate password", func() {
 		// arrange
 		tests := []test{
 			{
@@ -88,14 +93,13 @@ func TestValidateLogin(t *testing.T) {
 
 		// action & assert
 		for _, test := range tests {
-			err := authValidator.ValidateLogin(test.param)
+			err := s.authValidator.ValidateLogin(test.param)
 
 			message := "%s"
 			message += "\nUsername: %s"
 			message += "\nPassword: %s"
 
-			assert.ErrorAsf(
-				t,
+			s.Assert().ErrorAsf(
 				err,
 				&test.expectErr,
 				message,
@@ -104,8 +108,8 @@ func TestValidateLogin(t *testing.T) {
 		}
 	})
 
-	t.Run("It should return error nil if the given request is valid", func(t *testing.T) {
-		// arrang
+	s.Run("It should return error nil if the given request is valid", func() {
+		// arrange
 		tests := []test{
 			{
 				title: "Should not return an error",
@@ -125,14 +129,13 @@ func TestValidateLogin(t *testing.T) {
 
 		// action & assert
 		for _, test := range tests {
-			err := authValidator.ValidateLogin(test.param)
+			err := s.authValidator.ValidateLogin(test.param)
 
 			message := "%s"
 			message += "\nUsername: %s"
 			message += "\nPassword: %s"
 
-			assert.Nilf(
-				t,
+			s.Assert().Nilf(
 				err,
 				message,
 				test.title, test.param.Username, test.param.Password,
@@ -141,7 +144,7 @@ func TestValidateLogin(t *testing.T) {
 	})
 }
 
-func TestValdiateRegister(t *testing.T) {
+func (s *AuthValidatorTestSuite) TestValdiateRegister() {
 	// arrange
 	type test struct {
 		title     string
@@ -149,10 +152,7 @@ func TestValdiateRegister(t *testing.T) {
 		expectErr *validators.ValidatorError
 	}
 
-	validator := validators.NewValidator()
-	authValidator := NewAuthValidator(validator)
-
-	t.Run("It should validate username", func(t *testing.T) {
+	s.Run("It should validate username", func() {
 		// arrange
 		tests := []test{
 			{
@@ -176,13 +176,12 @@ func TestValdiateRegister(t *testing.T) {
 
 		// action & assert
 		for _, test := range tests {
-			err := authValidator.ValidateRegister(test.param)
+			err := s.authValidator.ValidateRegister(test.param)
 
 			message := "%s"
 			message += "\nUsername: %s"
 
-			assert.ErrorAsf(
-				t,
+			s.Assert().ErrorAsf(
 				err,
 				&test.expectErr,
 				message,
@@ -191,7 +190,7 @@ func TestValdiateRegister(t *testing.T) {
 		}
 	})
 
-	t.Run("It should validate password", func(t *testing.T) {
+	s.Run("It should validate password", func() {
 		// arrange
 		tests := []test{
 			{
@@ -215,13 +214,12 @@ func TestValdiateRegister(t *testing.T) {
 
 		// action & asert
 		for _, test := range tests {
-			err := authValidator.ValidateRegister(test.param)
+			err := s.authValidator.ValidateRegister(test.param)
 
 			message := "%s"
 			message += "\nPassword: %s"
 
-			assert.ErrorAsf(
-				t,
+			s.Assert().ErrorAsf(
 				err,
 				&test.expectErr,
 				message,
@@ -230,7 +228,7 @@ func TestValdiateRegister(t *testing.T) {
 		}
 	})
 
-	t.Run("It should vaildate gender", func(t *testing.T) {
+	s.Run("It should vaildate gender", func() {
 		// NEGATIVE TEST
 		// arrange
 		negatives := []test{
@@ -265,13 +263,12 @@ func TestValdiateRegister(t *testing.T) {
 
 		// action & assert
 		for _, test := range negatives {
-			err := authValidator.ValidateRegister(test.param)
+			err := s.authValidator.ValidateRegister(test.param)
 
 			message := "%s"
 			message += "\nGender: %#v"
 
-			assert.ErrorAsf(
-				t,
+			s.Assert().ErrorAsf(
 				err,
 				&test.expectErr,
 				message,
@@ -321,20 +318,19 @@ func TestValdiateRegister(t *testing.T) {
 
 		// action & assert
 		for _, test := range positives {
-			err := authValidator.ValidateRegister(test.param)
+			err := s.authValidator.ValidateRegister(test.param)
 
 			message := "%s"
 			message += "\nGender: %#v"
 
-			assert.Nilf(
-				t,
+			s.Assert().Nilf(
 				err,
 				test.title, test.param.Gender,
 			)
 		}
 	})
 
-	t.Run("It should validate birth date", func(t *testing.T) {
+	s.Run("It should validate birth date", func() {
 		// NEGATIVE
 		// arrange
 		negatives := []test{
@@ -369,14 +365,13 @@ func TestValdiateRegister(t *testing.T) {
 
 		// action & assert
 		for _, test := range negatives {
-			err := authValidator.ValidateRegister(test.param)
+			err := s.authValidator.ValidateRegister(test.param)
 
 			message := "%s"
 			message += "\nBirthDate: %#v"
 			message += "\nActualErr: %T"
 
-			assert.ErrorAsf(
-				t,
+			s.Assert().ErrorAsf(
 				err,
 				&test.expectErr,
 				message, test.title, test.param.BirthDate, err,
@@ -399,14 +394,13 @@ func TestValdiateRegister(t *testing.T) {
 
 		// action & assert
 		for _, test := range positives {
-			err := authValidator.ValidateRegister(test.param)
+			err := s.authValidator.ValidateRegister(test.param)
 
 			message := "%s"
 			message += "\nBirthDate: %#v"
 			message += "\nActualErr: %T"
 
-			assert.Nilf(
-				t,
+			s.Assert().Nilf(
 				err,
 				message, test.title, test.param.BirthDate, err,
 			)

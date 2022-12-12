@@ -7,13 +7,36 @@ import (
 	"go_todo_api/src/account/repositories/repositoriesfakes"
 	"go_todo_api/src/account/validators/validatorsfakes"
 	"go_todo_api/src/shared/entities"
-	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestNewAuthService(t *testing.T) {
-	t.Run("It should create appropiate instance of authService", func(t *testing.T) {
+type AuthServiceTestSuite struct {
+	suite.Suite
+	authValidator     *validatorsfakes.FakeAuthValidator
+	accountRepository *repositoriesfakes.FakeAccountRepository
+
+	authService AuthService
+}
+
+func (s *AuthServiceTestSuite) SetupSuite() {
+	wrapDBErr = func(err error) (code int) {
+		if val, ok := err.(*mockError); ok {
+			return val.code
+		}
+		return
+	}
+}
+
+func (s *AuthServiceTestSuite) SetupTest() {
+	s.authValidator = &validatorsfakes.FakeAuthValidator{}
+	s.accountRepository = &repositoriesfakes.FakeAccountRepository{}
+
+	s.authService = NewAuthService(s.authValidator, s.accountRepository)
+}
+
+func (s *AuthServiceTestSuite) TestNewAuthService() {
+	s.Run("It should create appropiate instance of authService", func() {
 		// arrange
 		authValidator := validatorsfakes.FakeAuthValidator{}
 		accountRepository := repositoriesfakes.FakeAccountRepository{}
@@ -23,25 +46,22 @@ func TestNewAuthService(t *testing.T) {
 		authService := NewAuthService(&authValidator, &accountRepository)
 
 		// assert
-		assert.Implements(t, (*AuthService)(nil), authService)
-		assert.IsType(t, &expect, authService)
+		s.Assert().Implements((*AuthService)(nil), authService)
+		s.Assert().IsType(&expect, authService)
 	})
 }
 
-func TestLogin(t *testing.T) {
+func (s *AuthServiceTestSuite) TestLogin() {
 	type test struct {
 		param  dto.LoginRequest
 		expect entities.BaseResponse[dto.LoginResponse]
 	}
 
-	t.Run("Test http response code 400", func(t *testing.T) {
+	s.Run("Test http response code 400", func() {
 
-		t.Run("It should return the correct response if the request validation is failed", func(t *testing.T) {
+		s.Run("validation failed", func() {
+			s.SetupTest()
 			// arrange
-			authValidator := validatorsfakes.FakeAuthValidator{}
-			accountRepository := repositoriesfakes.FakeAccountRepository{}
-			authService := NewAuthService(&authValidator, &accountRepository)
-
 			negative := test{
 				param: dto.LoginRequest{},
 				expect: entities.BaseResponse[dto.LoginResponse]{
@@ -51,14 +71,13 @@ func TestLogin(t *testing.T) {
 			}
 
 			// mock
-			authValidator.ValidateLoginReturns(fmt.Errorf("some validation is failed"))
+			s.authValidator.ValidateLoginReturns(fmt.Errorf("some validation is failed"))
 
 			// action
-			res := authService.Login(negative.param)
+			res := s.authService.Login(negative.param)
 
 			// assert response message
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				negative.expect.Message,
 				res.GetMessage(),
 				"should return correct response message\nMessage: %s\nExpect: %s",
@@ -66,8 +85,7 @@ func TestLogin(t *testing.T) {
 			)
 
 			// assert response data
-			assert.Exactlyf(
-				t,
+			s.Assert().Exactlyf(
 				negative.expect.Data,
 				res.Data,
 				"should return correct response data\nData: %#v\nExpect: %#v",
@@ -75,8 +93,7 @@ func TestLogin(t *testing.T) {
 			)
 
 			// assert response code
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				400,
 				res.GetCode(),
 				"should return correct resposne code\nCode: %d\nExpect: %d",
@@ -84,30 +101,26 @@ func TestLogin(t *testing.T) {
 			)
 
 			// assert method call count
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				1,
-				authValidator.ValidateLoginCallCount(),
+				s.authValidator.ValidateLoginCallCount(),
 				"validation method should called once.\nCount: %d\nExpect: %d",
-				authValidator.ValidateLoginCallCount(), 1,
+				s.authValidator.ValidateLoginCallCount(), 1,
 			)
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				0,
-				accountRepository.GetByUsernameCallCount(),
+				s.accountRepository.GetByUsernameCallCount(),
 				"GetByUsername should not to be called when validation is failed\nCount: %d\nExpect: %d",
-				accountRepository.CreateCallCount(), 0,
+				s.accountRepository.CreateCallCount(), 0,
 			)
 		})
 	})
 
-	t.Run("Test http response code 401", func(t *testing.T) {
+	s.Run("Test http response code 401", func() {
 
-		t.Run("It should return the correct response if the password mismatch", func(t *testing.T) {
+		s.Run("Password mismatch", func() {
+			s.SetupTest()
 			// arrange
-			authValidator := validatorsfakes.FakeAuthValidator{}
-			accountRepository := repositoriesfakes.FakeAccountRepository{}
-			accountService := NewAuthService(&authValidator, &accountRepository)
 			var password = "$2a$12$jhTVu0HPAzwDEbEkC/GgmeMoRCNymiRHNtgVn2RdjSQHcsWY0BNSu" // 12345678
 
 			negative := test{
@@ -122,8 +135,8 @@ func TestLogin(t *testing.T) {
 			}
 
 			// mock
-			authValidator.ValidateLoginReturns(nil)
-			accountRepository.GetByUsernameReturns(models.Account{
+			s.authValidator.ValidateLoginReturns(nil)
+			s.accountRepository.GetByUsernameReturns(models.Account{
 				Id:        1,
 				Username:  "yuu",
 				Password:  password,
@@ -132,11 +145,10 @@ func TestLogin(t *testing.T) {
 			}, nil)
 
 			// action
-			res := accountService.Login(negative.param)
+			res := s.authService.Login(negative.param)
 
 			// assert response message
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				negative.expect.Message,
 				res.GetMessage(),
 				"should return correct response message\nMessage: %s\nExpect: %s",
@@ -144,8 +156,7 @@ func TestLogin(t *testing.T) {
 			)
 
 			// assert response data
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				negative.expect.Data,
 				res.Data,
 				"shold return correct response data\nData: %#v\nExpect: %#v",
@@ -153,8 +164,7 @@ func TestLogin(t *testing.T) {
 			)
 
 			// assert response code
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				401,
 				res.GetCode(),
 				"should return correct response code\nCode: %d\nExpect: %d",
@@ -162,32 +172,27 @@ func TestLogin(t *testing.T) {
 			)
 
 			// assert method calls count
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				1,
-				authValidator.ValidateLoginCallCount(),
+				s.authValidator.ValidateLoginCallCount(),
 				"validation method should called once\nCount: %d\nExpect: %d",
-				authValidator.ValidateLoginCallCount(), 1,
+				s.authValidator.ValidateLoginCallCount(), 1,
 			)
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				1,
-				accountRepository.GetByUsernameCallCount(),
+				s.accountRepository.GetByUsernameCallCount(),
 				"GetByUsername should called once\nCount: %d\nExpect: %d",
-				accountRepository.GetByUsernameCallCount(), 1,
+				s.accountRepository.GetByUsernameCallCount(), 1,
 			)
 		})
 
 	})
 
-	t.Run("Test http response code 404", func(t *testing.T) {
+	s.Run("Test http response code 404", func() {
 
-		t.Run("It should return the correct response if the username not found", func(t *testing.T) {
+		s.Run("It should return the correct response if the username not found", func() {
+			s.SetupTest()
 			// arrange
-			authValidator := validatorsfakes.FakeAuthValidator{}
-			accountRepository := repositoriesfakes.FakeAccountRepository{}
-			authService := NewAuthService(&authValidator, &accountRepository)
-
 			negative := test{
 				param: dto.LoginRequest{
 					Username: "yuu",
@@ -199,23 +204,17 @@ func TestLogin(t *testing.T) {
 				},
 			}
 
-			wrapDBErr = func(err error) (code int) {
-				val := err.(*mockError)
-				return val.code
-			}
-
 			// mock
-			authValidator.ValidateLoginReturns(nil)
-			accountRepository.GetByUsernameReturns(models.Account{}, &mockError{
+			s.authValidator.ValidateLoginReturns(nil)
+			s.accountRepository.GetByUsernameReturns(models.Account{}, &mockError{
 				code: 404,
 			})
 
 			// action
-			res := authService.Login(negative.param)
+			res := s.authService.Login(negative.param)
 
 			// assert response message
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				negative.expect.Message,
 				res.GetMessage(),
 				"it should have the correct response message\nMessage: %s\nExpect: %s",
@@ -223,8 +222,7 @@ func TestLogin(t *testing.T) {
 			)
 
 			// assert response data
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				negative.expect.Data,
 				res.Data,
 				"it should have the correct response data\nData: %#v\nExpect: %#v",
@@ -232,28 +230,25 @@ func TestLogin(t *testing.T) {
 			)
 
 			// assert response code
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				404,
 				res.GetCode(),
 				"it should have the correct response code\nCode: %d\nExpect: %d",
 				res.GetCode(), 404,
 			)
 
-			// assert method call count
-			assert.Equalf(
-				t,
+			// assert method calls count
+			s.Assert().Equalf(
 				1,
-				authValidator.ValidateLoginCallCount(),
+				s.authValidator.ValidateLoginCallCount(),
 				"ValidateLoginCallCount should to be called once\nCount: %d\nExpect: %d",
-				authValidator.ValidateLoginCallCount(), 1,
+				s.authValidator.ValidateLoginCallCount(), 1,
 			)
-			assert.Equalf(
-				t,
+			s.Assert().Equalf(
 				1,
-				accountRepository.GetByUsernameCallCount(),
+				s.accountRepository.GetByUsernameCallCount(),
 				"GetByUsername should to be called once\nCount: %d\nExpect: %d",
-				accountRepository.CreateCallCount(), 1,
+				s.accountRepository.CreateCallCount(), 1,
 			)
 		})
 	})

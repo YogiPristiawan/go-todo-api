@@ -7,115 +7,113 @@ import (
 	"go_todo_api/src/shared/entities"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestNewAccountService(t *testing.T) {
-	t.Run("It should properly instantiate accountService", func(t *testing.T) {
+type AccountServiceTestSuite struct {
+	suite.Suite
+	accountRepository *repositoriesfakes.FakeAccountRepository
+
+	accountService AccountService
+}
+
+func TestAccountServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(AccountServiceTestSuite))
+}
+
+func (s *AccountServiceTestSuite) SetupSuite() {
+	wrapDBErr = func(err error) (code int) {
+		if val, ok := err.(*mockError); ok {
+			return val.code
+		}
+		return
+	}
+}
+
+func (s *AccountServiceTestSuite) SetupTest() {
+	s.accountRepository = &repositoriesfakes.FakeAccountRepository{}
+
+	s.accountService = NewAccountService(s.accountRepository)
+}
+
+func (s *AccountServiceTestSuite) TestNewAccountService() {
+	s.Run("It should properly instantiate accountService", func() {
+		s.SetupTest()
 		// arrange
-		accountRepository := repositoriesfakes.FakeAccountRepository{}
 		var expectedType accountService
 
 		// action
-		accountService := NewAccountService(&accountRepository)
+		accountService := NewAccountService(s.accountRepository)
 
 		// assert
-		assert.Implements(t, (*AccountService)(nil), accountService)
-		assert.IsType(t, &expectedType, accountService)
+		s.Assert().Implements((*AccountService)(nil), accountService)
+		s.Assert().IsType(&expectedType, accountService)
 	})
 }
 
-func TestGetProfile(t *testing.T) {
+func (s *AccountServiceTestSuite) TestGetProfile() {
 	type test struct {
-		title  string
 		param  dto.ProfileRequest
 		expect entities.BaseResponse[dto.ProfileResponse]
 	}
 
-	t.Run("It should return response 404 when profile is not found", func(t *testing.T) {
-		// arrange
-		accountRepository := repositoriesfakes.FakeAccountRepository{}
-		accountService := NewAccountService(&accountRepository)
+	s.Run("Test response code 404", func() {
+		s.Run("profile is not found", func() {
+			s.SetupTest()
+			// mock
+			s.accountRepository.GetProfileByUserIdReturns(models.Profile{}, &mockError{
+				code: 404,
+			})
 
-		// mock
-		wrapDBErr = func(err error) (code int) {
-			val := err.(*mockError)
-			return val.code
-		}
-		accountRepository.GetProfileByUserIdReturns(models.Profile{}, &mockError{
-			code: 404,
-		})
-
-		negative := test{
-			title: "Should provided the correct response",
-			param: dto.ProfileRequest{
-				RequestMetaData: entities.RequestMetaData{
-					AuthUserId: 1,
+			negative := test{
+				param: dto.ProfileRequest{
+					RequestMetaData: entities.RequestMetaData{
+						AuthUserId: 1,
+					},
 				},
-			},
-			expect: entities.BaseResponse[dto.ProfileResponse]{
-				Data: nil,
-			},
-		}
+				expect: entities.BaseResponse[dto.ProfileResponse]{
+					Data: nil,
+				},
+			}
 
-		// action
-		res := accountService.GetProfile(negative.param)
+			// action
+			res := s.accountService.GetProfile(negative.param)
 
-		// assert response message
-		message := "%s"
-		message += "\nMessage: %s"
-		message += "\nExpect: %s"
-		assert.Equalf(
-			t,
-			"profile not found",
-			res.GetMessage(),
-			message,
-			negative.title, res.Message, negative.expect.Message,
-		)
+			// assert response message
+			s.Assert().Equalf(
+				"profile not found",
+				res.GetMessage(),
+				"it should return the correct response message\nMessage: %s\nExpect: %s",
+				res.Message, negative.expect.Message,
+			)
 
-		// assert response data
-		message = "%s"
-		message += "\nData: %#v"
-		message += "\nExpect: %#v"
-		assert.Exactlyf(
-			t,
-			negative.expect.Data,
-			res.Data,
-			message,
-			negative.title, res.Data, negative.expect.Data,
-		)
+			// assert response data
+			s.Assert().Exactlyf(
+				negative.expect.Data,
+				res.Data,
+				"It should return the correct response data\nData: %#v\nExpect: %#v",
+				res.Data, negative.expect.Data,
+			)
 
-		// assert response code
-		message = "%s"
-		message += "\nCode: %d"
-		message += "\nExpect: %d"
-		assert.Equalf(
-			t,
-			404,
-			res.GetCode(),
-			message,
-			negative.title,
-			res.GetCode(),
-			404,
-		)
+			// assert response code
+			s.Assert().Equalf(
+				404,
+				res.GetCode(),
+				"It should return the correct response code\nCode: %s\nExpect: %d",
+				res.GetCode(),
+				404,
+			)
+		})
 	})
 
-	t.Run("It should return response 500 when server error is ouccured", func(t *testing.T) {
-		// arrange
-		accountRepository := repositoriesfakes.FakeAccountRepository{}
-		accountService := NewAccountService(&accountRepository)
-
+	s.Run("Test response code 500", func() {
+		s.SetupTest()
 		// mock
-		wrapDBErr = func(err error) (code int) {
-			val := err.(*mockError)
-			return val.code
-		}
-		accountRepository.GetProfileByUserIdReturns(models.Profile{}, &mockError{
+		s.accountRepository.GetProfileByUserIdReturns(models.Profile{}, &mockError{
 			code: 500,
 		})
 
 		negative := test{
-			title: "Should provided the correct response",
 			param: dto.ProfileRequest{
 				RequestMetaData: entities.RequestMetaData{
 					AuthUserId: 1,
@@ -127,28 +125,29 @@ func TestGetProfile(t *testing.T) {
 		}
 
 		// action
-		res := accountService.GetProfile(dto.ProfileRequest{})
+		res := s.accountService.GetProfile(negative.param)
 
-		// assert error message
-		message := "%s"
-		message += "\nMessage: %s"
-		message += "\nExpect: %s"
+		// assert error code
+		s.Assert().Exactlyf(
+			500,
+			res.GetCode(),
+			"It should return correct response code\nCode: %d\nExpect: %d",
+			res.GetCode(), 500,
+		)
 
-		assert.Exactlyf(
-			t,
-			"internal server error",
-			res.GetMessage(),
-			message,
-			negative.title, res.Message, negative.expect.Message,
+		// assert method calls count
+		s.Assert().Equalf(
+			1,
+			s.accountRepository.GetProfileByUserIdCallCount(),
+			"GetProfileByUserId has to be called once\nCount: %d\nExpect: %d",
+			s.accountRepository.GetProfileByUserIdCallCount(), 1,
 		)
 	})
 
-	t.Run("It should return response 200 when error is not occured", func(t *testing.T) {
+	s.Run("Test response code 200", func() {
+		s.SetupTest()
 		// arrange
-		accountRepository := repositoriesfakes.FakeAccountRepository{}
-		accountService := NewAccountService(&accountRepository)
 		positive := test{
-			title: "Should provide the correct response",
 			param: dto.ProfileRequest{
 				RequestMetaData: entities.RequestMetaData{
 					AuthUserId: 1,
@@ -166,10 +165,7 @@ func TestGetProfile(t *testing.T) {
 		}
 
 		// mock
-		wrapDBErr = func(err error) (code int) {
-			return
-		}
-		accountRepository.GetProfileByUserIdReturns(models.Profile{
+		s.accountRepository.GetProfileByUserIdReturns(models.Profile{
 			Id:        1,
 			Username:  "yuu",
 			Gender:    entities.String{Valid: true, String: "L"},
@@ -177,19 +173,22 @@ func TestGetProfile(t *testing.T) {
 		}, nil)
 
 		// action
-		res := accountService.GetProfile(positive.param)
+		res := s.accountService.GetProfile(positive.param)
 
 		// assert response
-		message := "%s"
-		message += "\nActual: %#v"
-		message += "\nExpect: %#v"
-
-		assert.Exactlyf(
-			t,
+		s.Assert().Exactlyf(
 			positive.expect,
 			res,
-			message,
-			positive.title, res, positive.expect,
+			"it sould return correct response\nResponse: %#v\nExpect: %#v",
+			res, positive.expect,
+		)
+
+		// assert method calls count
+		s.Assert().Equalf(
+			1,
+			s.accountRepository.GetProfileByUserIdCallCount(),
+			"GetProfileByUserId has to be called once\nCount: %d\nExpect: %d",
+			s.accountRepository.GetProfileByUserIdCallCount(), 1,
 		)
 
 	})
