@@ -6,11 +6,24 @@ import (
 	"go_todo_api/src/todo/dto"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestNewTodoValidator(t *testing.T) {
-	t.Run("It should properly instantiate todoValidator", func(t *testing.T) {
+type TodoValidatorTestSuite struct {
+	suite.Suite
+	todoValidator TodoValidator
+}
+
+func (s *TodoValidatorTestSuite) SetupSuite() {
+	s.todoValidator = NewTodoValidator(validators.NewValidator())
+}
+
+func TestTodoValidatorTestSuite(t *testing.T) {
+	suite.Run(t, new(TodoValidatorTestSuite))
+}
+
+func (s *TodoValidatorTestSuite) TestNewTodoValidator() {
+	s.Run("It should properly instantiate todoValidator", func() {
 		// arrange
 		validator := validators.NewValidator()
 		var expect *todoValidator
@@ -19,23 +32,19 @@ func TestNewTodoValidator(t *testing.T) {
 		todoV := NewTodoValidator(validator)
 
 		// assert
-		assert.IsTypef(t, expect, todoV, "Should return type of %T", expect)
-		assert.Implementsf(t, (*TodoValidator)(nil), todoV, "Should implement %T", (*TodoValidator)(nil))
+		s.Assert().IsTypef(expect, todoV, "Should return type of %T", expect)
+		s.Assert().Implementsf((*TodoValidator)(nil), todoV, "Should implement %T", (*TodoValidator)(nil))
 	})
 }
 
-func TestValidateStore(t *testing.T) {
+func (s *TodoValidatorTestSuite) TestValidateStore() {
 	type test struct {
 		title     string
 		param     dto.StoreTodoRequest
 		expectErr *validators.ValidatorError
 	}
 
-	// arrange
-	validator := validators.NewValidator()
-	todoValidator := NewTodoValidator(validator)
-
-	t.Run("It should validate todo", func(t *testing.T) {
+	s.Run("It should validate todo", func() {
 		// NEGATIVE
 		// arrange
 		negatives := []test{
@@ -58,13 +67,12 @@ func TestValidateStore(t *testing.T) {
 
 		// action & assert
 		for _, test := range negatives {
-			err := todoValidator.ValidateStore(test.param)
+			err := s.todoValidator.ValidateStore(test.param)
 
 			message := "%s"
 			message += "\nTodo: %s"
 
-			assert.ErrorAsf(
-				t,
+			s.Assert().ErrorAsf(
 				err,
 				&test.expectErr,
 				message, test.param.Todo,
@@ -86,21 +94,20 @@ func TestValidateStore(t *testing.T) {
 
 		// action & assert
 		for _, test := range positives {
-			err := todoValidator.ValidateStore(test.param)
+			err := s.todoValidator.ValidateStore(test.param)
 			fmt.Println(err)
 
 			message := "%s"
 			message += "\nTodo: %s"
 
-			assert.Nilf(
-				t,
+			s.Assert().Nilf(
 				err,
 				message, test.param.Todo,
 			)
 		}
 	})
 
-	t.Run("It should validate date", func(t *testing.T) {
+	s.Run("It should validate date", func() {
 		// arrange
 		negatives := []test{
 			{
@@ -138,13 +145,12 @@ func TestValidateStore(t *testing.T) {
 
 		// action & assert
 		for _, test := range negatives {
-			err := todoValidator.ValidateStore(test.param)
+			err := s.todoValidator.ValidateStore(test.param)
 
 			message := "%s"
 			message += "\nDate: %s"
 
-			assert.ErrorAsf(
-				t,
+			s.Assert().ErrorAsf(
 				err,
 				&test.expectErr,
 				message, test.param.Date,
@@ -166,13 +172,12 @@ func TestValidateStore(t *testing.T) {
 
 		// action & assert
 		for _, test := range positives {
-			err := todoValidator.ValidateStore(test.param)
+			err := s.todoValidator.ValidateStore(test.param)
 
 			message := "%s"
 			message += "\nDate: %s"
 
-			assert.Nilf(
-				t,
+			s.Assert().Nilf(
 				err,
 				message, test.title, test.param.Date,
 			)
@@ -180,7 +185,7 @@ func TestValidateStore(t *testing.T) {
 	})
 }
 
-func TestValidateDetail(t *testing.T) {
+func (s *TodoValidatorTestSuite) TestValidateDetail() {
 	// arange
 	type test struct {
 		title     string
@@ -188,10 +193,7 @@ func TestValidateDetail(t *testing.T) {
 		expectErr *validators.ValidatorError
 	}
 
-	validator := validators.NewValidator()
-	todoValidator := NewTodoValidator(validator)
-
-	t.Run("It should validate id", func(t *testing.T) {
+	s.Run("It should validate id", func() {
 		// arrange
 		negatives := []test{
 			{
@@ -202,13 +204,12 @@ func TestValidateDetail(t *testing.T) {
 
 		// action & assert
 		for _, test := range negatives {
-			err := todoValidator.ValidateDetail(test.param)
+			err := s.todoValidator.ValidateDetail(test.param)
 
 			message := "%s"
 			message += "\nId: %s"
 
-			assert.ErrorAsf(
-				t,
+			s.Assert().ErrorAsf(
 				err,
 				&test.expectErr,
 				message, test.title, test.param.Id,

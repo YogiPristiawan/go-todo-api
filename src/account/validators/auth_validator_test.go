@@ -4,6 +4,7 @@ import (
 	"go_todo_api/src/account/dto"
 	"go_todo_api/src/shared/entities"
 	"go_todo_api/src/shared/validators"
+	"testing"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -15,6 +16,10 @@ type AuthValidatorTestSuite struct {
 
 func (s *AuthValidatorTestSuite) SetupSuite() {
 	s.authValidator = NewAuthValidator(validators.NewValidator())
+}
+
+func TestAuthValidatorTestSuite(t *testing.T) {
+	suite.Run(t, new(AuthValidatorTestSuite))
 }
 
 func (s *AuthValidatorTestSuite) TestNewAuthValidator() {
@@ -38,9 +43,10 @@ func (s *AuthValidatorTestSuite) TestValidateLogin() {
 		expectErr *validators.ValidatorError
 	}
 
-	// arange
 	s.Run("It should validate username", func() {
-		tests := []test{
+		// NEGATIVE
+		// arrange
+		negative := []test{
 			{
 				title: "Should return an error when username is not provided",
 				param: dto.LoginRequest{
@@ -57,7 +63,7 @@ func (s *AuthValidatorTestSuite) TestValidateLogin() {
 		}
 
 		// assert
-		for _, test := range tests {
+		for _, test := range negative {
 			err := s.authValidator.ValidateLogin(test.param)
 
 			message := "%s"
@@ -74,8 +80,9 @@ func (s *AuthValidatorTestSuite) TestValidateLogin() {
 	})
 
 	s.Run("It should vaildate password", func() {
+		// NEGATIVE
 		// arrange
-		tests := []test{
+		negative := []test{
 			{
 				title: "Should return an error if password is not provided",
 				param: dto.LoginRequest{
@@ -92,7 +99,7 @@ func (s *AuthValidatorTestSuite) TestValidateLogin() {
 		}
 
 		// action & assert
-		for _, test := range tests {
+		for _, test := range negative {
 			err := s.authValidator.ValidateLogin(test.param)
 
 			message := "%s"
