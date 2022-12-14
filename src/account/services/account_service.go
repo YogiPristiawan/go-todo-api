@@ -7,8 +7,12 @@ import (
 	"go_todo_api/src/shared/entities"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 // AccountService is an abstract that contains
 // methods to handle account related bussiness logic
+//
+//counterfeiter:generate . AccountService
 type AccountService interface {
 	GetProfile(in dto.ProfileRequest) (out entities.BaseResponse[dto.ProfileResponse])
 }

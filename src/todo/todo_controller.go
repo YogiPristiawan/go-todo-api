@@ -90,6 +90,10 @@ func (t *todoController) Detail(c *gin.Context) {
 		return
 	}
 
+	out := t.service.Detail(in)
+
+	presentation.WriteRestOut(c, out, out.CommonResult)
+
 }
 
 // Update handle a request to update user todo data

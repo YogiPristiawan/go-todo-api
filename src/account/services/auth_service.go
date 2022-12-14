@@ -10,8 +10,12 @@ import (
 	"go_todo_api/src/shared/entities"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 // AuthServices is an abstract that contains
 // methods required to handle auth related bussiness logic
+//
+//counterfeiter:generate . AuthService
 type AuthService interface {
 	Login(in dto.LoginRequest) (out entities.BaseResponse[dto.LoginResponse])
 	Register(in dto.RegisterRequest) (out entities.BaseResponse[dto.RegisterResponse])

@@ -9,8 +9,12 @@ import (
 	"go_todo_api/src/todo/validators"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 // TodoService is an abstract that contains
 // methods to handle todo business logic
+//
+//counterfeiter:generate . TodoService
 type TodoService interface {
 	Store(in dto.StoreTodoRequest) (out entities.BaseResponse[dto.StoreTodoResponse])
 	Find(in dto.FindTodoRequest) (out entities.BaseResponseArray[dto.FindTodoResponse])
