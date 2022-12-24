@@ -59,3 +59,14 @@ func mapDetailToResponse(res *dto.DetailTodoResponse, todo models.Todo) {
 	res.UpdatedAt = todo.UpdatedAt
 	res.CreatedAt = todo.CreatedAt
 }
+
+// mapUpdateTodoResponse handle struct mapping from
+// TodoModel into UpdateTodoResponse
+func mapUpdateTodoResponse(res *dto.UpdateTodoResponse, todo models.Todo) {
+	res.Id = todo.Id
+	res.Todo = todo.Todo
+	res.Date = todo.Date
+	res.IsFinished = todo.IsFinished
+	res.CreatedAt = todo.CreatedAt
+	res.UpdatedAt = todo.UpdatedAt
+}

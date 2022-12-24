@@ -17,6 +17,7 @@ type TodoRepository interface {
 	Store(todo *models.Todo) error
 	Find(userId int64) (todos []models.Todo, err error)
 	Detail(userId, todoId int64) (todo models.Todo, err error)
+	Update(todo *models.Todo) (model models.Todo, err error)
 }
 
 // todoRepository is a struct that has methods
@@ -96,5 +97,45 @@ func (t *todoRepository) Detail(userId, todoId int64) (todo models.Todo, err err
 
 	err = t.db.QueryRow(context.Background(), sql, userId, todoId).Scan(
 		&todo.Id, &todo.Todo, &todo.Date, &todo.IsFinished, &todo.CreatedAt, &todo.UpdatedAt)
+	return
+}
+
+// Update handle an action to update the todo data
+func (t *todoRepository) Update(todo *models.Todo) (model models.Todo, err error) {
+	var sql = `
+		SELECT
+			id, user_id, todo, date, is_finished, created_at, updated_at
+		FROM
+			todos
+		WHERE user_id = $1 AND id = $2`
+
+	err = t.db.QueryRow(context.Background(), sql,
+		todo.UserId, todo.Id,
+	).Scan(
+		&model.Id, &model.UserId, &model.Todo, &model.Date,
+		&model.IsFinished, &model.CreatedAt, &model.UpdatedAt,
+	)
+	if err != nil {
+		return
+	}
+
+	var updateSql = `
+		UPDATE
+			todos
+		SET
+			todo = $1, date = $2, is_finished = $3,
+			updated_at = $4
+		WHERE
+			id = $5 AND user_id = $6`
+
+	// make updated data
+	model.Todo = todo.Todo
+	model.Date = todo.Date
+	model.IsFinished = todo.IsFinished
+	model.UpdatedAt = time.Now().Unix()
+
+	_, err = t.db.Exec(context.Background(), updateSql,
+		model.Todo, model.Date, model.IsFinished, model.UpdatedAt, model.Id, model.UserId,
+	)
 	return
 }

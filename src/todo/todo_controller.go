@@ -98,7 +98,32 @@ func (t *todoController) Detail(c *gin.Context) {
 
 // Update handle a request to update user todo data
 func (t *todoController) Update(c *gin.Context) {
+	// get authenticated user
+	authUserId, _ := c.Get("auth_user_id")
 
+	// make payload
+	in := dto.UpdateTodoRequest{
+		RequestMetaData: entities.RequestMetaData{
+			AuthUserId: authUserId.(int64),
+		},
+	}
+
+	// bind request param
+	if err := presentation.ReadUriIn(c, &in); err != nil {
+		o := entities.CommonResult{}
+		presentation.WriteRestOut(c, o, o)
+		return
+	}
+
+	// bind request body
+	if err := presentation.ReadRestIn(c, &in); err != nil {
+		o := entities.CommonResult{}
+		presentation.WriteRestOut(c, o, o)
+		return
+	}
+	out := t.service.Update(in)
+
+	presentation.WriteRestOut(c, out, out.CommonResult)
 }
 
 // Delete handle a request to delete user todo data

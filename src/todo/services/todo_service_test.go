@@ -678,3 +678,180 @@ func (s *TodoServiceTestSuite) TestDetail() {
 		)
 	})
 }
+
+func (s *TodoServiceTestSuite) TestUpdate() {
+	type test struct {
+		param  dto.UpdateTodoRequest
+		expect entities.BaseResponse[dto.UpdateTodoResponse]
+	}
+
+	s.Run("Test response code 200", func() {
+		// arrange
+		s.SetupTest()
+
+		positive := test{
+			param: dto.UpdateTodoRequest{
+				RequestMetaData: entities.RequestMetaData{
+					AuthUserId: 2,
+				},
+				Id:         1,
+				Todo:       "Todo after update",
+				Date:       "2022-02-02",
+				IsFinished: true,
+			},
+			expect: entities.BaseResponse[dto.UpdateTodoResponse]{
+				Message: "todo updated",
+				Data: &dto.UpdateTodoResponse{
+					Id:         1,
+					Todo:       "Todo after update",
+					Date:       "2022-02-02",
+					IsFinished: true,
+					CreatedAt:  1670874430,
+					UpdatedAt:  1671072430,
+				},
+			},
+		}
+
+		// mock
+		s.todoRepository.UpdateCalls(func(model *models.Todo) (todo models.Todo, err error) {
+			if model == nil {
+				err = &mockError{code: 500}
+				return
+			}
+			todo.Id = model.Id
+			todo.UserId = model.UserId
+			todo.Todo = model.Todo
+			todo.Date = model.Date
+			todo.IsFinished = model.IsFinished
+			todo.CreatedAt = 1670874430
+			todo.UpdatedAt = 1671072430
+			return
+		})
+
+		// action
+		res := s.todoService.Update(positive.param)
+
+		// assert response message
+		s.Assert().Equalf(
+			positive.expect.Message,
+			res.GetMessage(),
+			"It should return the correct response message\nMessage: %s\nExpect: %s",
+			res.GetMessage(), positive.expect.Message,
+		)
+
+		// assert response data
+		s.Assert().Exactlyf(
+			positive.expect.Data,
+			res.Data,
+			"It should return the correct response data\nData: %#v\nExpect: %#v",
+			res.Data, positive.expect.Data,
+		)
+
+		// assert response code
+		s.Assert().Equalf(
+			200,
+			res.GetCode(),
+			"It should return the correct response code\nCode: %d\nExpect: %d",
+			res.GetCode(), 200,
+		)
+
+		// assert method calls count
+		s.Assert().Equalf(
+			1,
+			s.todoRepository.UpdateCallCount(),
+			"todoRepository.Update has to be called once\nCount: %d\nExpect: %d",
+			s.todoRepository.DetailCallCount(), 1,
+		)
+	})
+
+	s.Run("Test response code 400", func() {
+		s.Run("request validation is failed", func() {
+			// arrange
+			s.SetupTest()
+
+			negative := test{
+				param: dto.UpdateTodoRequest{
+					RequestMetaData: entities.RequestMetaData{
+						AuthUserId: 2,
+					},
+				},
+				expect: entities.BaseResponse[dto.UpdateTodoResponse]{
+					Message: "some request validation is failed",
+					Data:    nil,
+				},
+			}
+
+			// mock
+			s.todoValidator.ValidateUpdateReturns(fmt.Errorf("some request validation is failed"))
+
+			// action
+			res := s.todoService.Update(negative.param)
+
+			// assert response message
+			s.Assert().Equalf(
+				negative.expect.Message,
+				res.GetMessage(),
+				"It should return the correct response message\nMessage: %s\nExpect: %s",
+				res.GetMessage(), negative.expect.Message,
+			)
+
+			// assert response data
+			s.Assert().Equalf(
+				negative.expect.Data,
+				res.Data,
+				"It should return the correct response data\nData: %#v\nExpect: %#v",
+				res.Data, negative.expect.Data,
+			)
+
+			// assert response code
+			s.Assert().Equalf(
+				400,
+				res.GetCode(),
+				"It should return the correct response code\nCode: %d\nExpect: %d",
+				res.GetCode(), 400,
+			)
+
+			// assert method calls count
+			s.Assert().Equalf(
+				0,
+				s.todoRepository.UpdateCallCount(),
+				"todoRepository.Update should not be called when validation is failed\nCount: %d\nExpect: %d",
+				s.todoRepository.DetailCallCount(), 0,
+			)
+		})
+	})
+
+	s.Run("Test response code 500", func() {
+		// arrange
+		s.SetupTest()
+		negative := test{
+			param: dto.UpdateTodoRequest{},
+			expect: entities.BaseResponse[dto.UpdateTodoResponse]{
+				Data: nil,
+			},
+		}
+
+		// mock
+		s.todoValidator.ValidateUpdateReturns(nil)
+		s.todoRepository.UpdateReturns(models.Todo{}, &mockError{code: 500})
+
+		// action
+		res := s.todoService.Update(negative.param)
+
+		// assert response data
+		s.Assert().Equalf(
+			negative.expect.Data,
+			res.Data,
+			"It should return the correct response data\nData: %#v\nExpect: %#v",
+			res.Data, negative.expect.Data,
+		)
+
+		// assert response code
+		s.Assert().Equalf(
+			500,
+			res.GetCode(),
+			"It should return the correct response code\nCode: %d\nExpect: %d",
+			res.GetCode(), 500,
+		)
+	})
+}

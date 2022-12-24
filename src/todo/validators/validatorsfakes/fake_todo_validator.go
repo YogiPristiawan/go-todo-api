@@ -30,6 +30,17 @@ type FakeTodoValidator struct {
 	validateStoreReturnsOnCall map[int]struct {
 		result1 error
 	}
+	ValidateUpdateStub        func(dto.UpdateTodoRequest) error
+	validateUpdateMutex       sync.RWMutex
+	validateUpdateArgsForCall []struct {
+		arg1 dto.UpdateTodoRequest
+	}
+	validateUpdateReturns struct {
+		result1 error
+	}
+	validateUpdateReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -156,6 +167,67 @@ func (fake *FakeTodoValidator) ValidateStoreReturnsOnCall(i int, result1 error) 
 	}{result1}
 }
 
+func (fake *FakeTodoValidator) ValidateUpdate(arg1 dto.UpdateTodoRequest) error {
+	fake.validateUpdateMutex.Lock()
+	ret, specificReturn := fake.validateUpdateReturnsOnCall[len(fake.validateUpdateArgsForCall)]
+	fake.validateUpdateArgsForCall = append(fake.validateUpdateArgsForCall, struct {
+		arg1 dto.UpdateTodoRequest
+	}{arg1})
+	stub := fake.ValidateUpdateStub
+	fakeReturns := fake.validateUpdateReturns
+	fake.recordInvocation("ValidateUpdate", []interface{}{arg1})
+	fake.validateUpdateMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeTodoValidator) ValidateUpdateCallCount() int {
+	fake.validateUpdateMutex.RLock()
+	defer fake.validateUpdateMutex.RUnlock()
+	return len(fake.validateUpdateArgsForCall)
+}
+
+func (fake *FakeTodoValidator) ValidateUpdateCalls(stub func(dto.UpdateTodoRequest) error) {
+	fake.validateUpdateMutex.Lock()
+	defer fake.validateUpdateMutex.Unlock()
+	fake.ValidateUpdateStub = stub
+}
+
+func (fake *FakeTodoValidator) ValidateUpdateArgsForCall(i int) dto.UpdateTodoRequest {
+	fake.validateUpdateMutex.RLock()
+	defer fake.validateUpdateMutex.RUnlock()
+	argsForCall := fake.validateUpdateArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeTodoValidator) ValidateUpdateReturns(result1 error) {
+	fake.validateUpdateMutex.Lock()
+	defer fake.validateUpdateMutex.Unlock()
+	fake.ValidateUpdateStub = nil
+	fake.validateUpdateReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeTodoValidator) ValidateUpdateReturnsOnCall(i int, result1 error) {
+	fake.validateUpdateMutex.Lock()
+	defer fake.validateUpdateMutex.Unlock()
+	fake.ValidateUpdateStub = nil
+	if fake.validateUpdateReturnsOnCall == nil {
+		fake.validateUpdateReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.validateUpdateReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeTodoValidator) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -163,6 +235,8 @@ func (fake *FakeTodoValidator) Invocations() map[string][][]interface{} {
 	defer fake.validateDetailMutex.RUnlock()
 	fake.validateStoreMutex.RLock()
 	defer fake.validateStoreMutex.RUnlock()
+	fake.validateUpdateMutex.RLock()
+	defer fake.validateUpdateMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

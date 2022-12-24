@@ -15,6 +15,7 @@ import (
 type TodoValidator interface {
 	ValidateStore(in dto.StoreTodoRequest) error
 	ValidateDetail(in dto.DetailTodoRequest) error
+	ValidateUpdate(in dto.UpdateTodoRequest) error
 }
 
 // todoValidator is a struct that has methods
@@ -39,5 +40,9 @@ func (t *todoValidator) ValidateStore(in dto.StoreTodoRequest) error {
 // ValidateDetail handle action to validate todo get detail
 // action data
 func (t *todoValidator) ValidateDetail(in dto.DetailTodoRequest) error {
+	return customErrorMsg(t.validator.Struct(in))
+}
+
+func (t *todoValidator) ValidateUpdate(in dto.UpdateTodoRequest) error {
 	return customErrorMsg(t.validator.Struct(in))
 }

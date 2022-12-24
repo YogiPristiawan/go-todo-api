@@ -42,6 +42,17 @@ type FakeTodoService struct {
 	storeReturnsOnCall map[int]struct {
 		result1 entities.BaseResponse[dto.StoreTodoResponse]
 	}
+	UpdateStub        func(dto.UpdateTodoRequest) entities.BaseResponse[dto.UpdateTodoResponse]
+	updateMutex       sync.RWMutex
+	updateArgsForCall []struct {
+		arg1 dto.UpdateTodoRequest
+	}
+	updateReturns struct {
+		result1 entities.BaseResponse[dto.UpdateTodoResponse]
+	}
+	updateReturnsOnCall map[int]struct {
+		result1 entities.BaseResponse[dto.UpdateTodoResponse]
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -229,6 +240,67 @@ func (fake *FakeTodoService) StoreReturnsOnCall(i int, result1 entities.BaseResp
 	}{result1}
 }
 
+func (fake *FakeTodoService) Update(arg1 dto.UpdateTodoRequest) entities.BaseResponse[dto.UpdateTodoResponse] {
+	fake.updateMutex.Lock()
+	ret, specificReturn := fake.updateReturnsOnCall[len(fake.updateArgsForCall)]
+	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
+		arg1 dto.UpdateTodoRequest
+	}{arg1})
+	stub := fake.UpdateStub
+	fakeReturns := fake.updateReturns
+	fake.recordInvocation("Update", []interface{}{arg1})
+	fake.updateMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeTodoService) UpdateCallCount() int {
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	return len(fake.updateArgsForCall)
+}
+
+func (fake *FakeTodoService) UpdateCalls(stub func(dto.UpdateTodoRequest) entities.BaseResponse[dto.UpdateTodoResponse]) {
+	fake.updateMutex.Lock()
+	defer fake.updateMutex.Unlock()
+	fake.UpdateStub = stub
+}
+
+func (fake *FakeTodoService) UpdateArgsForCall(i int) dto.UpdateTodoRequest {
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	argsForCall := fake.updateArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeTodoService) UpdateReturns(result1 entities.BaseResponse[dto.UpdateTodoResponse]) {
+	fake.updateMutex.Lock()
+	defer fake.updateMutex.Unlock()
+	fake.UpdateStub = nil
+	fake.updateReturns = struct {
+		result1 entities.BaseResponse[dto.UpdateTodoResponse]
+	}{result1}
+}
+
+func (fake *FakeTodoService) UpdateReturnsOnCall(i int, result1 entities.BaseResponse[dto.UpdateTodoResponse]) {
+	fake.updateMutex.Lock()
+	defer fake.updateMutex.Unlock()
+	fake.UpdateStub = nil
+	if fake.updateReturnsOnCall == nil {
+		fake.updateReturnsOnCall = make(map[int]struct {
+			result1 entities.BaseResponse[dto.UpdateTodoResponse]
+		})
+	}
+	fake.updateReturnsOnCall[i] = struct {
+		result1 entities.BaseResponse[dto.UpdateTodoResponse]
+	}{result1}
+}
+
 func (fake *FakeTodoService) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -238,6 +310,8 @@ func (fake *FakeTodoService) Invocations() map[string][][]interface{} {
 	defer fake.findMutex.RUnlock()
 	fake.storeMutex.RLock()
 	defer fake.storeMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

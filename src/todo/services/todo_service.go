@@ -19,6 +19,7 @@ type TodoService interface {
 	Store(in dto.StoreTodoRequest) (out entities.BaseResponse[dto.StoreTodoResponse])
 	Find(in dto.FindTodoRequest) (out entities.BaseResponseArray[dto.FindTodoResponse])
 	Detail(in dto.DetailTodoRequest) (out entities.BaseResponse[dto.DetailTodoResponse])
+	Update(in dto.UpdateTodoRequest) (out entities.BaseResponse[dto.UpdateTodoResponse])
 }
 
 // todoService is a struct that has methods
@@ -88,7 +89,7 @@ func (t *todoService) Find(in dto.FindTodoRequest) (out entities.BaseResponseArr
 	return
 }
 
-// Detail handle business logic action to ge detail of user todo data
+// Detail handle business logic action to get detail of user todo data
 func (t *todoService) Detail(in dto.DetailTodoRequest) (out entities.BaseResponse[dto.DetailTodoResponse]) {
 	// validate request
 	if err := t.validator.ValidateDetail(in); err != nil {
@@ -111,5 +112,38 @@ func (t *todoService) Detail(in dto.DetailTodoRequest) (out entities.BaseRespons
 	mapDetailToResponse(out.Data, todo)
 
 	out.SetResponse(200, nil, "detail of todo")
+	return
+}
+
+// Update handle business logic for update todo
+func (t *todoService) Update(in dto.UpdateTodoRequest) (out entities.BaseResponse[dto.UpdateTodoResponse]) {
+	// validate the request
+	if err := t.validator.ValidateUpdate(in); err != nil {
+		out.SetResponse(400, err)
+		return
+	}
+
+	// update todo
+	todoModel := models.Todo{
+		Id:         in.Id,
+		UserId:     in.AuthUserId,
+		Todo:       in.Todo,
+		Date:       in.Date,
+		IsFinished: in.IsFinished,
+	}
+	todo, err := t.todoRepo.Update(&todoModel)
+
+	switch wrapDBErr(err) {
+	case 404:
+		out.SetResponse(404, fmt.Errorf("todo not found"))
+		return
+	case 500:
+		out.SetResponse(500, err)
+		return
+	}
+
+	out.Data = &dto.UpdateTodoResponse{}
+	mapUpdateTodoResponse(out.Data, todo)
+	out.SetResponse(200, nil, "todo updated")
 	return
 }

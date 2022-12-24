@@ -46,6 +46,19 @@ type FakeTodoRepository struct {
 	storeReturnsOnCall map[int]struct {
 		result1 error
 	}
+	UpdateStub        func(*models.Todo) (models.Todo, error)
+	updateMutex       sync.RWMutex
+	updateArgsForCall []struct {
+		arg1 *models.Todo
+	}
+	updateReturns struct {
+		result1 models.Todo
+		result2 error
+	}
+	updateReturnsOnCall map[int]struct {
+		result1 models.Todo
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -240,6 +253,70 @@ func (fake *FakeTodoRepository) StoreReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakeTodoRepository) Update(arg1 *models.Todo) (models.Todo, error) {
+	fake.updateMutex.Lock()
+	ret, specificReturn := fake.updateReturnsOnCall[len(fake.updateArgsForCall)]
+	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
+		arg1 *models.Todo
+	}{arg1})
+	stub := fake.UpdateStub
+	fakeReturns := fake.updateReturns
+	fake.recordInvocation("Update", []interface{}{arg1})
+	fake.updateMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeTodoRepository) UpdateCallCount() int {
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	return len(fake.updateArgsForCall)
+}
+
+func (fake *FakeTodoRepository) UpdateCalls(stub func(*models.Todo) (models.Todo, error)) {
+	fake.updateMutex.Lock()
+	defer fake.updateMutex.Unlock()
+	fake.UpdateStub = stub
+}
+
+func (fake *FakeTodoRepository) UpdateArgsForCall(i int) *models.Todo {
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	argsForCall := fake.updateArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeTodoRepository) UpdateReturns(result1 models.Todo, result2 error) {
+	fake.updateMutex.Lock()
+	defer fake.updateMutex.Unlock()
+	fake.UpdateStub = nil
+	fake.updateReturns = struct {
+		result1 models.Todo
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeTodoRepository) UpdateReturnsOnCall(i int, result1 models.Todo, result2 error) {
+	fake.updateMutex.Lock()
+	defer fake.updateMutex.Unlock()
+	fake.UpdateStub = nil
+	if fake.updateReturnsOnCall == nil {
+		fake.updateReturnsOnCall = make(map[int]struct {
+			result1 models.Todo
+			result2 error
+		})
+	}
+	fake.updateReturnsOnCall[i] = struct {
+		result1 models.Todo
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeTodoRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -249,6 +326,8 @@ func (fake *FakeTodoRepository) Invocations() map[string][][]interface{} {
 	defer fake.findMutex.RUnlock()
 	fake.storeMutex.RLock()
 	defer fake.storeMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
